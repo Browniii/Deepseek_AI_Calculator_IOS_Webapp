@@ -66,8 +66,8 @@
             height: 0;
         }
         * {
-            -ms-overflow-style: none !important;  /* IE and Edge */
-            scrollbar-width: none !important;  /* Firefox */
+            -ms-overflow-style: none !important; 
+            scrollbar-width: none !important; 
         }
 
         html, body {
@@ -115,7 +115,7 @@
             font-weight: bold; width: 80%; text-align: center; pointer-events: none; z-index: 100; 
         }
 
-        /* --- OVERLAY PANELS --- */
+        /* --- OVERLAY PANELS & ACCORDIONS --- */
         @keyframes modalSlideUp {
             0% { opacity: 0; transform: translateY(40px) scale(0.95); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -125,26 +125,78 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 15, 15, 0.65); z-index: 1000;
             backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%);
-            display: none; flex-direction: column; padding: 10% 6%;
+            display: none; flex-direction: column; 
+            padding: 10% 6% 25% 6%;
             box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch;
             animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             touch-action: pan-y;
         }
+        
+        .overlay-panel > * { flex-shrink: 0; }
+
         .settings-header { 
-            font-size: 28px; font-weight: 800; margin-bottom: 25px; text-align: center; 
+            font-size: 28px; font-weight: 800; margin-bottom: 20px; text-align: center; 
             background: linear-gradient(135deg, #ffffff, #aaaaaa);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .setting-item { 
-            margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; 
-            background: rgba(45, 45, 45, 0.4); padding: 16px; 
-            border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 20px rgba(0,0,0,0.2);
+
+        /* Sleek Collapsible Groups */
+        details.settings-group {
+            background: rgba(45, 45, 45, 0.4); border-radius: 18px; margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 15px rgba(0,0,0,0.15);
+            transition: background 0.3s;
         }
+        details.settings-group[open] { background: rgba(55, 55, 55, 0.5); }
+        details.settings-group summary {
+            padding: 16px; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer;
+            list-style: none; display: flex; justify-content: space-between; align-items: center;
+            outline: none; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;
+        }
+        details.settings-group summary::-webkit-details-marker { display: none; }
+        details.settings-group summary::after {
+            content: '›'; font-size: 22px; font-weight: 300; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.5;
+        }
+        details.settings-group[open] summary::after { transform: rotate(90deg); opacity: 1;}
+        .settings-group-content { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 14px; }
+
+        .setting-item { display: flex; flex-direction: column; gap: 6px; position: relative; transition: opacity 0.3s; }
+        
+        /* Updated row setup to allow info-text to expand block dynamically */
+        .setting-item.row { flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .setting-item.row .info-text { flex-basis: 100%; margin-top: 10px; order: 3; }
+        
+        .label-wrapper { display: flex; align-items: center; gap: 8px; }
         .setting-item label { 
             font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; 
-            letter-spacing: 1px; color: #fff; margin-bottom: 4px;
+            letter-spacing: 1px; color: #fff;
         }
+        
+        /* Information Orbs and Text */
+        .info-icon {
+            display: inline-flex; justify-content: center; align-items: center;
+            width: 16px; height: 16px; border-radius: 50%; background: rgba(255,255,255,0.2);
+            color: #fff; font-size: 10px; font-weight: 800; cursor: pointer; font-family: -apple-system, sans-serif;
+            transition: background 0.2s, transform 0.2s; flex-shrink: 0;
+        }
+        .info-icon:active { background: var(--operator-orange); transform: scale(0.9); }
+        .info-text {
+            font-size: 12px; color: rgba(255,255,255,0.85); display: none; margin-top: 4px; margin-bottom: 6px; 
+            line-height: 1.5; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 10px;
+            border-left: 3px solid var(--operator-orange); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .info-text.visible { display: block; animation: modalSlideUp 0.2s ease forwards; }
+        .info-text a { color: var(--operator-orange); text-decoration: underline; font-weight: 600; }
+
+        /* Document Section Styles */
+        .doc-section { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .doc-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .doc-section h4 { margin: 0 0 8px 0; color: var(--operator-orange); font-size: 13px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 1px;}
+        .doc-section p { margin: 0 0 6px 0; }
+        .doc-section ul { margin: 0; padding-left: 20px; }
+        .doc-section li { margin-bottom: 4px; }
+        .doc-icon { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
         .setting-item input[type="text"], .setting-item input[type="password"], .setting-item select, .setting-item textarea {
             width: 100%; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.05); 
             color: white; padding: 12px 14px; border-radius: 12px; font-size: 14px; outline: none; 
@@ -154,13 +206,12 @@
             border-color: rgba(255, 147, 0, 0.6); box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 0 0 3px rgba(255, 147, 0, 0.15); background: rgba(0,0,0,0.4);
         }
         .setting-item textarea { height: 80px; resize: none; font-family: inherit; font-size: 13px; line-height: 1.4; }
-        .setting-item.row { flex-direction: row; justify-content: space-between; align-items: center; }
         
         input[type="checkbox"] {
             -webkit-appearance: none; appearance: none;
             width: 50px; height: 30px; background: rgba(255,255,255,0.15);
             border-radius: 30px; position: relative; cursor: pointer; outline: none; transition: background 0.3s;
-            margin: 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            margin: 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); flex-shrink: 0;
         }
         input[type="checkbox"]::after {
             content: ''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px;
@@ -206,8 +257,7 @@
             max-height: 5.5em; 
             overflow-y: auto; overflow-x: hidden; word-break: break-word; white-space: pre-wrap; 
             margin-bottom: 8px; outline: none; user-select: text; -webkit-user-select: text; caret-color: transparent; 
-            touch-action: pan-y;
-            padding: 8px 0;
+            touch-action: pan-y; padding: 8px 0;
         }
         .typed-text-display:focus { caret-color: #FFFFFF; } 
         .screen { font-size: var(--font-screen); font-weight: 300; line-height: 1; margin: 0; letter-spacing: 0.5px; color: #FFFFFF; transition: font-size 0.2s ease-out; }
@@ -225,14 +275,14 @@
         }
         .calc-btn:active { transform: scale(0.85); filter: brightness(1.4); }
         .calc-btn svg { width: 45%; height: 45%; stroke: currentColor; fill: none; stroke-width: 1.5; }
-        .helper-text { position: absolute; bottom: 10%; font-size: 9px; text-transform: lowercase; opacity: 0.25; display: none; }
+        .helper-text { position: absolute; bottom: 10%; font-size: 9px; text-transform: lowercase; opacity: 0.25; display: none; pointer-events: none; }
 
         .scientific-grid { display: grid; grid-template-columns: repeat(6, var(--btn-upper-w)); justify-content: center; gap: var(--gap-btn); transition: opacity 0.3s; }
         .sci-btn { background-color: var(--sci-dark-grey); width: var(--btn-upper-w); font-size: var(--font-upper); white-space: nowrap; }
         .sci-btn sup, .sci-btn sub { font-size: 0.6em; pointer-events: none; }
         .stacked-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 0.9; }
-        .stacked-btn span:first-child { font-size: 1em; transform: translateY(2px); }
-        .stacked-btn span:last-child { font-size: 0.65em; transform: translateY(-2px); }
+        .stacked-btn span:first-child { font-size: 1em; transform: translateY(2px); pointer-events: none; }
+        .stacked-btn span:last-child { font-size: 0.65em; transform: translateY(-2px); pointer-events: none; }
 
         .basic-grid { display: grid; grid-template-columns: repeat(4, var(--btn-lower-w)); justify-content: center; gap: var(--gap-btn); }
         .btn-action { background-color: var(--action-grey); font-size: var(--font-action); }
@@ -275,170 +325,320 @@
         <!-- SETTINGS PANEL -->
         <div id="settings-panel" class="overlay-panel">
             <div class="settings-header">Preferences</div>
-            <div class="setting-item">
-                <label>Gemini API Key (For Image Extraction)</label>
-                <input type="password" id="input-gemini-key" placeholder="Paste your Gemini key here">
-            </div>
-            <div class="setting-item">
-                <label>DeepSeek API Key (For Math/Text)</label>
-                <input type="password" id="input-api-key" placeholder="Paste your DeepSeek key here">
-            </div>
-            <div class="setting-item row">
-                <label>Auto-Send Image Text to DeepSeek</label>
-                <input type="checkbox" id="input-autodeepseek-toggle">
-            </div>
-            <div class="setting-item row">
-                <label>AI Context Memory (Send Log)</label>
-                <input type="checkbox" id="input-memory-toggle">
-            </div>
-            <div class="setting-item">
-                <label>Model Mode (DeepSeek)</label>
-                <select id="input-model-mode">
-                    <option value="deepseek-reasoner">Reasoning (Reasoner)</option>
-                    <option value="deepseek-chat">Thinking (Chat)</option>
-                </select>
-            </div>
             
-            <div class="setting-item">
-                <label>Thinking Instructions (DeepSeek Chat)</label>
-                <textarea id="prompt-thinking" placeholder="Instructions..."></textarea>
-            </div>
-            <div class="setting-item">
-                <label>Reasoning Instructions (DeepSeek Reasoner)</label>
-                <textarea id="prompt-reasoning" placeholder="Instructions..."></textarea>
-            </div>
-            <div class="setting-item">
-                <label>Gemini Extraction Prompt (Vision -> Text)</label>
-                <textarea id="prompt-gemini" placeholder="Instructions..."></textarea>
-            </div>
-            <div class="setting-item">
-                <label>Camera Direct Solve Prompt (Vision Only)</label>
-                <textarea id="prompt-camera" placeholder="Instructions..."></textarea>
-            </div>
-            
-            <div class="setting-item" id="setting-item-ratio">
-                <label>Camera Aspect Ratio</label>
-                <select id="input-cam-ratio">
-                    <option value="4:3">4:3 (Standard Photo)</option>
-                    <option value="16:9">16:9 (Widescreen)</option>
-                </select>
-            </div>
-            <div class="setting-item" id="setting-item-zoom">
-                <label>Camera Hardware Zoom</label>
-                <select id="input-cam-zoom">
-                    <option value="0.5">0.5x (Ultra-wide)</option>
-                    <option value="1">1x (Standard)</option>
-                    <option value="2">2x (Telephoto)</option>
-                </select>
-            </div>
-            <div class="setting-item">
-                <label>Camera View Fit</label>
-                <select id="input-cam-fit">
-                    <option value="cover">Fill Screen</option>
-                    <option value="contain">Fit to Screen</option>
-                </select>
-            </div>
-            <div class="setting-item">
-                <label>AI Temperature: <span id="label-ai-temp">0.2</span></label>
-                <input type="range" id="input-ai-temp" min="0" max="2" step="0.1" value="0.2">
-            </div>
-            <div class="setting-item">
-                <label>Text Above Opacity: <span id="label-text-opacity">20</span>%</label>
-                <input type="range" id="input-text-opacity" min="0" max="100" value="20">
-            </div>
-            <div class="setting-item">
-                <label>Keyboard Opacity: <span id="label-kbd-opacity">10</span>%</label>
-                <input type="range" id="input-kbd-opacity" min="0" max="100" value="10">
-            </div>
-            <div class="setting-item">
-                <label>Camera Opacity: <span id="label-cam-opacity">10</span>%</label>
-                <input type="range" id="input-cam-opacity" min="0" max="100" value="10">
-            </div>
-            <div class="setting-item">
-                <label>Picture Opacity: <span id="label-pic-opacity">15</span>%</label>
-                <input type="range" id="input-pic-opacity" min="0" max="100" value="15">
-            </div>
-            <div class="setting-item">
-                <label>History Log Opacity: <span id="label-log-opacity">10</span>%</label>
-                <input type="range" id="input-log-opacity" min="0" max="100" value="10">
-            </div>
-            <div class="setting-item row">
-                <label>Overlay Active</label>
-                <input type="checkbox" id="input-overlay-toggle">
-            </div>
-            <div class="setting-item row">
-                <label>Liquid Glass Mode</label>
-                <input type="checkbox" id="input-glass-toggle">
-            </div>
-            <div class="setting-item row">
-                <label>Auto-Glass in Camera</label>
-                <input type="checkbox" id="input-auto-glass-toggle">
-            </div>
+            <details class="settings-group">
+                <summary>API Keys & Processing</summary>
+                <div class="settings-group-content">
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Gemini API Key (Image Extraction)</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Gemini provides state-of-the-art vision extraction for images. If provided, the app prioritizes Gemini for analyzing pictures. <b>Free Tier Available.</b><br><br>👉 <a href="https://aistudio.google.com/app/apikey" target="_blank">Get your Free Gemini Key here</a></div>
+                        <input type="password" id="input-gemini-key" placeholder="Paste your Gemini key here">
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>DeepSeek API Key (Math/Text)</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">DeepSeek handles advanced mathematical reasoning and text responses. Text queries map here automatically.</div>
+                        <input type="password" id="input-api-key" placeholder="Paste your DeepSeek key here">
+                    </div>
+                    <div class="setting-item row" id="wrap-autodeepseek">
+                        <div class="label-wrapper">
+                            <label>Auto-Send Image Text to DeepSeek</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <input type="checkbox" id="input-autodeepseek-toggle">
+                        <div class="info-text">If ON, Gemini will perfectly extract the image text, then silently pass it to DeepSeek's reasoning engine to solve. <b>Requires BOTH keys above linked!</b> If greyed out, link your keys.</div>
+                    </div>
+                    <div class="setting-item row">
+                        <div class="label-wrapper">
+                            <label>AI Context Memory (Send Log)</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <input type="checkbox" id="input-memory-toggle">
+                        <div class="info-text">If ON, the AI will remember your previous text prompts and answers from the active History Log. (Image data is intentionally ignored to prevent confusion).</div>
+                    </div>
+                </div>
+            </details>
+
+            <details class="settings-group">
+                <summary>Models & Instructions</summary>
+                <div class="settings-group-content">
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Model Mode (DeepSeek)</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Choose between the standard Chat model (faster) or the Reasoner model (DeepSeek-R1) which uses advanced chain-of-thought to solve complex math.</div>
+                        <select id="input-model-mode">
+                            <option value="deepseek-reasoner">Reasoning (Reasoner)</option>
+                            <option value="deepseek-chat">Thinking (Chat)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Thinking Instructions (DeepSeek Chat)</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">The system prompt used when sending text to the standard DeepSeek Chat model.</div>
+                        <textarea id="prompt-thinking" placeholder="Instructions..."></textarea>
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Reasoning Instructions (DeepSeek Reasoner)</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">The system prompt used when sending extracted image text to the DeepSeek Reasoner model.</div>
+                        <textarea id="prompt-reasoning" placeholder="Instructions..."></textarea>
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Gemini Extraction Prompt (Vision -> Text)</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Instructions for Gemini to perfectly read the image, ignore layout, and return pure text for DeepSeek to solve.</div>
+                        <textarea id="prompt-gemini" placeholder="Instructions..."></textarea>
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Camera Direct Solve Prompt (Vision Only)</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Instructions used if Auto-Send to DeepSeek is disabled. Gemini will both read and answer the question directly itself.</div>
+                        <textarea id="prompt-camera" placeholder="Instructions..."></textarea>
+                    </div>
+                </div>
+            </details>
+
+            <details class="settings-group">
+                <summary>Camera & Interface Setup</summary>
+                <div class="settings-group-content">
+                    <div class="setting-item" id="setting-item-ratio">
+                        <div class="label-wrapper">
+                            <label>Camera Aspect Ratio</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Matches the hardware camera ratio to the UI. 4:3 is the iOS default for photos. Automatically hidden if not supported by your browser.</div>
+                        <select id="input-cam-ratio">
+                            <option value="4:3">4:3 (Standard Photo)</option>
+                            <option value="16:9">16:9 (Widescreen)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item" id="setting-item-zoom">
+                        <div class="label-wrapper">
+                            <label>Camera Hardware Zoom</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Forces the device to switch to specific physical lenses (e.g., 0.5x ultra-wide). Automatically hidden if not supported by your browser.</div>
+                        <select id="input-cam-zoom">
+                            <option value="0.5">0.5x (Ultra-wide)</option>
+                            <option value="1">1x (Standard)</option>
+                            <option value="2">2x (Telephoto)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Camera View Fit</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Choose whether the camera feed completely fills the background (Fill) or shrinks to show the whole view without cropping (Fit).</div>
+                        <select id="input-cam-fit">
+                            <option value="cover">Fill Screen</option>
+                            <option value="contain">Fit to Screen</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>AI Temperature: <span id="label-ai-temp">0.2</span></label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Controls AI creativity. Lower values (0.0 - 0.2) force the AI to be highly factual and deterministic for math.</div>
+                        <input type="range" id="input-ai-temp" min="0" max="2" step="0.1" value="0.2">
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Text Above Opacity: <span id="label-text-opacity">20</span>%</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Adjusts the faint visibility of previous mathematical text in the display area above the main numbers.</div>
+                        <input type="range" id="input-text-opacity" min="0" max="100" value="20">
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Keyboard Opacity: <span id="label-kbd-opacity">10</span>%</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Adjusts the background faintness of the AI QWERTY keyboard.</div>
+                        <input type="range" id="input-kbd-opacity" min="0" max="100" value="10">
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Camera Opacity: <span id="label-cam-opacity">10</span>%</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Adjusts how transparent the live camera feed is behind the calculator buttons.</div>
+                        <input type="range" id="input-cam-opacity" min="0" max="100" value="10">
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>Picture Opacity: <span id="label-pic-opacity">15</span>%</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Adjusts how transparent a captured photo is behind the calculator buttons.</div>
+                        <input type="range" id="input-pic-opacity" min="0" max="100" value="15">
+                    </div>
+                    <div class="setting-item">
+                        <div class="label-wrapper">
+                            <label>History Log Opacity: <span id="label-log-opacity">10</span>%</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <div class="info-text">Adjusts the faint visibility of the scrolling History Log.</div>
+                        <input type="range" id="input-log-opacity" min="0" max="100" value="10">
+                    </div>
+                    <div class="setting-item row">
+                        <div class="label-wrapper">
+                            <label>Overlay Active</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <input type="checkbox" id="input-overlay-toggle">
+                        <div class="info-text">Controls the faint visibility of the mathematical pad sitting behind the AI keyboard mode. Turn this ON if you want the app to look like you're using a normal calculator.</div>
+                    </div>
+                    <div class="setting-item row">
+                        <div class="label-wrapper">
+                            <label>Liquid Glass Mode</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <input type="checkbox" id="input-glass-toggle">
+                        <div class="info-text">Forces a beautiful, computationally heavy blurred refractive glass aesthetic across all UI panels globally. Turn this ON if you want to use the camera but not have your view blocked by solid icons.</div>
+                    </div>
+                    <div class="setting-item row">
+                        <div class="label-wrapper">
+                            <label>Auto-Glass in Camera</label>
+                            <span class="info-icon" onclick="toggleInfo(this)">i</span>
+                        </div>
+                        <input type="checkbox" id="input-auto-glass-toggle">
+                        <div class="info-text">Only enables the stunning Liquid Glass aesthetic automatically while the camera lens is active. Reverts to solid colors when closed.</div>
+                    </div>
+                </div>
+            </details>
+
+            <details class="settings-group">
+                <summary>Info & App Guides</summary>
+                <div class="settings-group-content">
+                    <div class="setting-item" style="background: transparent; box-shadow: none; border: none; padding: 0;">
+                        <div class="info-text visible" style="font-size: 13px; opacity: 0.9; margin: 0; background: rgba(0,0,0,0.3); border-left: 2px solid #525252;">
+                            
+                            <div class="doc-section">
+                                <h4><svg class="doc-icon" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg> Installing the iOS WebApp</h4>
+                                <p>This application is precisely engineered for iPhone screens. To get the seamless, full-screen experience:</p>
+                                <ul>
+                                    <li>Open this link in <b>Safari</b>.</li>
+                                    <li>Tap the <b>Share</b> icon at the bottom center.</li>
+                                    <li>Scroll down and tap <b>Add to Home Screen</b>.</li>
+                                    <li>Launch the app directly from your home screen!</li>
+                                </ul>
+                            </div>
+
+                            <div class="doc-section">
+                                <h4><svg class="doc-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> Getting a Free Gemini API Key</h4>
+                                <p>Gemini provides state-of-the-art vision models for free. To unlock camera features:</p>
+                                <ul>
+                                    <li>Navigate to <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>.</li>
+                                    <li>Sign in with your Google Account.</li>
+                                    <li>Click <b>Create API Key</b>.</li>
+                                    <li>Copy the text and paste it into the <i>Gemini API Key</i> box in settings.</li>
+                                </ul>
+                            </div>
+
+                            <div class="doc-section">
+                                <h4><svg class="doc-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Interacting with the AI</h4>
+                                <p>Tap the <svg style="width:14px; height:14px; display:inline-block; vertical-align:middle; stroke:var(--operator-orange);" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg> to enter AI Mode.</p>
+                                <ul>
+                                    <li>Use the AI keyboard or tap the top text area to use your system keyboard.</li>
+                                    <li>Tap <b>=</b> to <b>Send/Solve</b>.</li>
+                                    <li>Tap the <svg style="width:14px; height:14px; display:inline-block; vertical-align:middle; stroke:var(--operator-orange);" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><circle cx="8" cy="11" r="1"/><circle cx="12" cy="11" r="1"/><circle cx="16" cy="11" r="1"/><circle cx="8" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="16" cy="15" r="1"/><line x1="8" y1="19" x2="16" y2="19"/></svg> (top left) to instantly return to the normal calculator.</li>
+                                    <li>Tap the <svg style="width:14px; height:14px; display:inline-block; vertical-align:middle; stroke:var(--operator-orange);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg> (top right) to view your History Log.</li>
+                                </ul>
+                            </div>
+
+                            <div class="doc-section">
+                                <h4><svg class="doc-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> Using the Camera</h4>
+                                <ul>
+                                    <li>In AI Mode, tap <b>0</b> to open the lens, then <b>0</b> again to snap.</li>
+                                    <li>Tap <b>-</b> to retake, <b>.</b> to cancel, and <b>=</b> to solve!</li>
+                                    <li>Tap <b>+/-</b> during camera mode to hot-swap engines (Gemini vs DeepSeek).</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </details>
+
             <button class="close-btn" id="clear-log-btn" style="background: var(--action-grey); box-shadow: none; margin-top: 20px;">Clear History Log</button>
             <button class="close-btn" id="close-settings-btn">Done</button>
         </div>
 
         <!-- HEADER UI -->
         <div class="header">
-            <button class="header-btn" id="toggle-log-btn" aria-label="History Log">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg>
-            </button>
-            <button class="header-btn" id="toggle-keyboard-btn" aria-label="Math Notes">
-                <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" ref="2"></rect><line x1="8" y1="8" x2="16" y2="8"></line><circle cx="8" cy="13" r="1" fill="currentColor"></circle><circle cx="12" cy="13" r="1" fill="currentColor"></circle><circle cx="16" cy="13" r="1" fill="currentColor"></circle><circle cx="8" cy="17" r="1" fill="currentColor"></circle><circle cx="12" cy="17" r="1" fill="currentColor"></circle><circle cx="16" cy="17" r="1" fill="currentColor"></circle></svg>
-            </button>
+            <div style="display:flex; gap:10px;">
+                <button class="header-btn" id="btn-settings-open" aria-label="Settings">
+                    <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" fill="none" stroke-width="1.5"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" fill="none" stroke-width="1.5"/></svg>
+                </button>
+                <button class="header-btn" id="btn-reset-calc" aria-label="Reset Calculator">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/><line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="11" r="1" fill="currentColor"/><circle cx="12" cy="11" r="1" fill="currentColor"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/><line x1="8" y1="19" x2="16" y2="19" stroke="currentColor" stroke-width="1.5"/></svg>
+                </button>
+            </div>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="header-btn" id="toggle-log-btn" aria-label="History Log">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg>
+                </button>
+                <button class="header-btn" id="toggle-keyboard-btn" aria-label="AI Mode">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg>
+                </button>
+            </div>
         </div>
 
-        <!-- DYNAMIC DISPLAYS -->
         <div class="display-container">
             <div class="typed-text-display" id="typed-display" contenteditable="true" spellcheck="false"></div>
             <div class="screen" id="display">0</div>
         </div>
 
-        <!-- KEYPADS -->
         <div class="keypad">
             <div class="scientific-grid" id="scientific-pad">
-                <!-- Row 1 -->
                 <button class="calc-btn sci-btn">(</button>
                 <button class="calc-btn sci-btn">)</button>
                 <button class="calc-btn sci-btn">mc</button>
                 <button class="calc-btn sci-btn">m+</button>
                 <button class="calc-btn sci-btn">m-</button>
                 <button class="calc-btn sci-btn">mr</button>
-                
-                <!-- Row 2 -->
-                <button class="calc-btn sci-btn stacked-btn" id="btn-2nd">
-                    <span>2</span><span>nd</span>
-                </button>
-                <button class="calc-btn sci-btn">x<sup>2</sup></button>
-                <button class="calc-btn sci-btn">x<sup>3</sup></button>
-                <button class="calc-btn sci-btn">x<sup>y</sup></button>
+                <button class="calc-btn sci-btn stacked-btn" id="btn-2nd"><span>2</span><span>nd</span></button>
+                <button class="calc-btn sci-btn" id="btn-x2">x<sup>2</sup></button>
+                <button class="calc-btn sci-btn" id="btn-x3">x<sup>3</sup></button>
+                <button class="calc-btn sci-btn" id="btn-xy">x<sup>y</sup></button>
                 <button class="calc-btn sci-btn" id="btn-ex">e<sup>x</sup></button>
                 <button class="calc-btn sci-btn" id="btn-10x">10<sup>x</sup></button>
-                
-                <!-- Row 3 -->
-                <button class="calc-btn sci-btn" id="btn-1x">
-                    <sup>1</sup><span style="font-size:1.2em; font-weight:300; margin: 0 -2px;">/</span><sub>x</sub>
-                </button>
-                <button class="calc-btn sci-btn"><sup>2</sup>√x</button>
-                <button class="calc-btn sci-btn"><sup>3</sup>√x</button>
-                <button class="calc-btn sci-btn"><sup>y</sup>√x</button>
+                <button class="calc-btn sci-btn" id="btn-1x"><sup>1</sup><span style="font-size:1.2em; font-weight:300; margin: 0 -2px;">/</span><sub>x</sub></button>
+                <button class="calc-btn sci-btn" id="btn-2root"><sup>2</sup>√x</button>
+                <button class="calc-btn sci-btn" id="btn-3root"><sup>3</sup>√x</button>
+                <button class="calc-btn sci-btn" id="btn-yroot"><sup>y</sup>√x</button>
                 <button class="calc-btn sci-btn" id="btn-ln">ln</button>
                 <button class="calc-btn sci-btn" id="btn-log">log<sub>10</sub></button>
-                
-                <!-- Row 4 -->
-                <button class="calc-btn sci-btn">x!</button>
+                <button class="calc-btn sci-btn" id="btn-fact">x!</button>
                 <button class="calc-btn sci-btn" id="btn-sin">sin</button>
                 <button class="calc-btn sci-btn" id="btn-cos">cos</button>
                 <button class="calc-btn sci-btn" id="btn-tan">tan</button>
-                <button class="calc-btn sci-btn">e</button>
-                <button class="calc-btn sci-btn">EE</button>
-                
-                <!-- Row 5 -->
-                <button class="calc-btn sci-btn">Rand</button>
+                <button class="calc-btn sci-btn" id="btn-e">e</button>
+                <button class="calc-btn sci-btn" id="btn-ee">EE</button>
+                <button class="calc-btn sci-btn" id="btn-rand">Rand</button>
                 <button class="calc-btn sci-btn" id="btn-sinh">sinh</button>
                 <button class="calc-btn sci-btn" id="btn-cosh">cosh</button>
                 <button class="calc-btn sci-btn" id="btn-tanh">tanh</button>
-                <button class="calc-btn sci-btn">π</button>
+                <button class="calc-btn sci-btn" id="btn-pi">π</button>
                 <button class="calc-btn sci-btn" id="btn-rad">Rad</button>
             </div>
             
@@ -447,27 +647,35 @@
                 <div id="kbd-layout-content" style="display:contents"></div>
             </div>
             
-            <!-- Standard numeric pad -->
             <div class="basic-grid">
                 <button class="calc-btn basic-btn btn-action" aria-label="Backspace"><svg viewBox="0 0 24 24"><path d="M 8 6 H 19 C 20.1 6 21 6.9 21 8 V 16 C 21 17.1 20.1 18 19 18 H 8 L 3 12 Z" stroke-linejoin="round"></path><line x1="11" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="11" y2="15"></line></svg></button>
                 <button class="calc-btn basic-btn btn-action" id="btn-ac">AC<span class="helper-text">clear</span></button>
-                <button class="calc-btn basic-btn btn-action">%</button>
-                <button class="calc-btn basic-btn btn-operator" id="btn-settings-trigger">÷<span class="helper-text">settings</span></button>
-                <button class="calc-btn basic-btn btn-number" id="btn-7">7</button><button class="calc-btn basic-btn btn-number" id="btn-8">8</button><button class="calc-btn basic-btn btn-number" id="btn-9">9</button><button class="calc-btn basic-btn btn-operator">×</button>
+                <button class="calc-btn basic-btn btn-action" id="btn-percent">%</button>
+                <button class="calc-btn basic-btn btn-operator" id="btn-div">÷</button>
+                <button class="calc-btn basic-btn btn-number" id="btn-7">7</button><button class="calc-btn basic-btn btn-number" id="btn-8">8</button><button class="calc-btn basic-btn btn-number" id="btn-9">9</button><button class="calc-btn basic-btn btn-operator" id="btn-mul">×</button>
                 <button class="calc-btn basic-btn btn-number" id="btn-4">4</button><button class="calc-btn basic-btn btn-number" id="btn-5">5</button><button class="calc-btn basic-btn btn-number" id="btn-6">6</button>
                 <button class="calc-btn basic-btn btn-operator" id="btn-minus">-<span class="helper-text" id="helper-minus"></span></button>
                 <button class="calc-btn basic-btn btn-number" id="btn-1">1</button><button class="calc-btn basic-btn btn-number" id="btn-2">2</button><button class="calc-btn basic-btn btn-number" id="btn-3">3</button>
-                <button class="calc-btn basic-btn btn-operator" id="btn-plus">+<span class="helper-text" id="helper-plus">send</span></button>
+                <button class="calc-btn basic-btn btn-operator" id="btn-plus">+</button>
                 <button class="calc-btn basic-btn btn-number btn-plus-minus" id="btn-pm" aria-label="Plus Minus"><svg viewBox="0 0 40 40"><path d="M 10 14 L 18 14 M 14 10 L 14 18" stroke-width="2.5" stroke-linecap="round"/><line x1="13" y1="28" x2="27" y2="12" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="26" x2="30" y2="26" stroke-width="2.5" stroke-linecap="round"/></svg><span class="helper-text" id="helper-pm"></span></button>
                 <button class="calc-btn basic-btn btn-number" id="btn-0">0<span class="helper-text" id="helper-0"></span></button>
                 <button class="calc-btn basic-btn btn-number" id="btn-dot">.<span class="helper-text" id="helper-dot"></span></button>
-                <button class="calc-btn basic-btn btn-operator" id="btn-equals">=<span class="helper-text">return</span></button>
+                <button class="calc-btn basic-btn btn-operator" id="btn-equals">=<span class="helper-text" id="helper-equals"></span></button>
             </div>
         </div>
     </div>
 
     <!-- MAIN APPLICATION SCRIPT -->
     <script>
+        // Global toggle for info tabs
+        function toggleInfo(element) {
+            const container = element.closest('.setting-item');
+            const infoText = container.querySelector('.info-text');
+            if (infoText) {
+                infoText.classList.toggle('visible');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             /* --- ELEMENT DEFINITIONS --- */
             const video = document.getElementById('camera-view');
@@ -594,6 +802,19 @@
                 document.getElementById('input-cam-zoom').value = prefs.camZoom;
                 document.getElementById('input-cam-fit').value = prefs.camFit;
                 
+                // Dynamic Disabling Logic
+                const autoDsToggle = document.getElementById('input-autodeepseek-toggle');
+                const autoDsItem = autoDsToggle.closest('.setting-item');
+                if (!prefs.apiKey || !prefs.geminiKey) {
+                    autoDsToggle.disabled = true;
+                    autoDsToggle.style.opacity = '0.5';
+                    autoDsItem.querySelector('label').style.opacity = '0.4';
+                } else {
+                    autoDsToggle.disabled = false;
+                    autoDsToggle.style.opacity = '1';
+                    autoDsItem.querySelector('label').style.opacity = '0.6';
+                }
+                
                 video.style.objectFit = prefs.camFit;
                 photoPreview.style.objectFit = prefs.camFit;
                 
@@ -696,14 +917,14 @@
 
             const bringEssentialsToFront = (active) => {
                 const essentials = [
-                    document.getElementById('btn-0'), document.getElementById('btn-plus'),
+                    document.getElementById('btn-0'), document.getElementById('btn-equals'),
                     document.getElementById('btn-minus'), document.getElementById('btn-dot'),
                     document.getElementById('btn-pm')
                 ];
                 essentials.forEach(btn => { if (active) btn.classList.add('camera-essential'); else btn.classList.remove('camera-essential'); });
                 helpers.forEach(h => {
                     const parentId = h.parentElement.id;
-                    if (active && !['btn-0', 'btn-plus', 'btn-minus', 'btn-dot', 'btn-pm'].includes(parentId)) { h.style.visibility = 'hidden'; } 
+                    if (active && !['btn-0', 'btn-equals', 'btn-minus', 'btn-dot', 'btn-pm'].includes(parentId)) { h.style.visibility = 'hidden'; } 
                     else { h.style.visibility = 'visible'; }
                 });
             };
@@ -711,18 +932,30 @@
             const updateCameraHelpers = () => {
                 const h0 = document.getElementById('helper-0');
                 const hDot = document.getElementById('helper-dot');
-                const hPlus = document.getElementById('helper-plus');
+                const hEq = document.getElementById('helper-equals');
                 const hMinus = document.getElementById('helper-minus');
                 const hPm = document.getElementById('helper-pm');
                 
                 if (isKeyboardMode) {
-                    h0.style.display = 'block'; hDot.style.display = 'block'; hPlus.style.display = 'block'; hPm.style.display = 'block';
+                    h0.style.display = 'block'; hDot.style.display = 'block'; hEq.style.display = 'block'; hPm.style.display = 'block';
                     h0.textContent = !isCameraOn ? 'camera' : (isPhotoTaken ? '' : 'capture');
                     hDot.textContent = isCameraOn ? 'cancel' : '';
-                    hPlus.textContent = isPhotoTaken ? 'solve' : 'send';
+                    
+                    // Equal is now the universal send key
+                    if (isCameraOn && !isPhotoTaken) hEq.textContent = ''; // Cannot send live feed
+                    else hEq.textContent = isPhotoTaken ? 'solve' : 'send';
+                    
                     hMinus.textContent = isPhotoTaken ? 'retake' : '';
                     hMinus.style.display = isPhotoTaken ? 'block' : 'none';
-                    hPm.textContent = isCameraOn || isPhotoTaken ? (prefs.autoDeepSeek ? 'deepseek' : 'gemini') : '';
+                    
+                    // Toggle helper logic
+                    if (prefs.apiKey && prefs.geminiKey) {
+                        hPm.textContent = isCameraOn || isPhotoTaken ? (prefs.autoDeepSeek ? 'deepseek' : 'gemini') : '';
+                    } else {
+                        hPm.textContent = ''; // Hide toggle helper if missing keys
+                    }
+                } else {
+                    hEq.textContent = 'return';
                 }
             };
 
@@ -751,7 +984,6 @@
                             if (isGemini) {
                                 chunk = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
                             } else {
-                                // Deepseek uses choices[0].delta.content (and optionally reasoning_content, but we'll stick to final content for display)
                                 chunk = data.choices?.[0]?.delta?.content || "";
                             }
                             if (chunk) {
@@ -763,12 +995,9 @@
                                 typedDisplay.textContent = fullText;
                                 typedDisplay.scrollTop = typedDisplay.scrollHeight;
                             }
-                        } catch (e) {
-                            // Silently ignore incomplete JSON chunks in SSE
-                        }
+                        } catch (e) {}
                     }
                 }
-                // Fallback catch in case response was instantaneous or empty
                 if (!hasCleared && fullText) typedDisplay.textContent = fullText;
                 return fullText;
             };
@@ -777,7 +1006,7 @@
             const callDeepSeek = async (imageB64 = null) => {
                 const userContent = typedDisplay.textContent.trim();
 
-                // Validation logic prioritizing DeepSeek for text, Gemini for vision, but allowing full fallback if only one key is present.
+                // Validation
                 if (imageB64) {
                     if (!prefs.geminiKey && !prefs.apiKey) {
                         apiStatus.textContent = "API KEY REQUIRED";
@@ -814,8 +1043,6 @@
                                 let lastGeminiError = "";
                                 let usedGeminiModel = "";
                                 
-                                // Smart Model Fallback Array (Gemini 3.0 -> 3.1 -> 2.5)
-                                // We DO NOT stream this extraction phase as we want it perfectly silent
                                 const geminiModels = ["gemini-3.0-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash"];
                                 
                                 for (const model of geminiModels) {
@@ -872,7 +1099,6 @@
                                 
                                 const finalResult = await parseStream(dsRes, false);
                                 
-                                // Log final answer to history
                                 blocks.push({ header: `SOLUTION (${prefs.model})`, text: finalResult });
                                 history.push({ blocks });
                                 localStorage.setItem('aiHistory', JSON.stringify(history));
@@ -904,7 +1130,6 @@
                                             usedGeminiModel = model;
                                             break;
                                         } else {
-                                            // Handle error responses safely without breaking standard JSON parse
                                             let errorMsg = `HTTP ${res.status}`;
                                             try { const errData = await res.json(); errorMsg = errData.error?.message || errorMsg; } catch(e) {}
                                             lastGeminiError = errorMsg;
@@ -1020,6 +1245,7 @@
                         setTimeout(() => apiStatus.style.display = "none", 2000);
                     }
                 } catch (e) {
+                    // Do not prematurely hide THINKING state until done or error.
                     apiStatus.textContent = "API ERROR";
                     setTimeout(() => apiStatus.style.display = "none", 3000);
                     typedDisplay.textContent = `Error Details:\n${e.message}`;
@@ -1028,8 +1254,23 @@
             };
 
             /* --- EVENT HANDLERS --- */
+            
+            // Header Action Triggers
+            document.getElementById('btn-settings-open').onclick = () => { settingsPanel.style.display = 'flex'; };
+            document.getElementById('btn-reset-calc').onclick = () => { 
+                isKeyboardMode = false; isLogMode = false; logPad.classList.remove('active'); 
+                kbdGrid.classList.remove('active'); stopCameraSystem(); applyPrefs(); 
+            };
+            
             toggleKeyboardBtn.onclick = () => { isKeyboardMode = !isKeyboardMode; isLogMode = false; logPad.classList.remove('active'); kbdGrid.classList.toggle('active', isKeyboardMode); helpers.forEach(h => h.style.display = isKeyboardMode ? 'block' : 'none'); if (isCameraOn) stopCameraSystem(); applyPrefs(); if (isKeyboardMode) renderKeyboard(); };
+            
             toggleLogBtn.onclick = () => { 
+                if (!isLogMode && history.length === 0) {
+                    apiStatus.textContent = "NO LOG YET";
+                    apiStatus.style.display = "block";
+                    setTimeout(() => apiStatus.style.display = "none", 2000);
+                    return;
+                }
                 isLogMode = !isLogMode; 
                 isKeyboardMode = false; 
                 kbdGrid.classList.remove('active'); 
@@ -1043,7 +1284,7 @@
             };
 
             const renderLog = () => {
-                logPad.innerHTML = history.length === 0 ? '<div style="opacity:0.3; text-align:center; margin-top:30px; color:white;">no log yet</div>' : '';
+                logPad.innerHTML = '';
                 history.forEach(entry => {
                     const div = document.createElement('div');
                     div.className = 'log-entry';
@@ -1117,8 +1358,10 @@
 
             const handleScientific = (btn) => {
                 let val = parseFloat(currentInput), res = val;
-                const id = btn.id;
-                const text = btn.textContent.trim().replace(/\s/g, ''); 
+                // Safely grab the closest calc-btn ID in case a child span was clicked
+                const targetBtn = btn.closest('.calc-btn');
+                const id = targetBtn.id;
+                const text = targetBtn.textContent.trim().replace(/\s/g, ''); 
                 
                 const factorial = (n) => {
                     if (n < 0 || !Number.isInteger(n)) return NaN;
@@ -1139,8 +1382,8 @@
                     document.getElementById('btn-sinh').innerHTML = is2nd ? 'sinh⁻¹' : 'sinh';
                     document.getElementById('btn-cosh').innerHTML = is2nd ? 'cosh⁻¹' : 'cosh';
                     document.getElementById('btn-tanh').innerHTML = is2nd ? 'tanh⁻¹' : 'tanh';
-                    btn.style.backgroundColor = is2nd ? '#FFFFFF' : 'var(--sci-dark-grey)';
-                    btn.style.color = is2nd ? '#000000' : '#FFFFFF';
+                    targetBtn.style.backgroundColor = is2nd ? '#FFFFFF' : 'var(--sci-dark-grey)';
+                    targetBtn.style.color = is2nd ? '#000000' : '#FFFFFF';
                     return;
                 }
 
@@ -1150,30 +1393,30 @@
                 if (text === 'm+') { memoryValue += val; waitingForNewValue = true; return; }
                 if (text === 'm-') { memoryValue -= val; waitingForNewValue = true; return; }
                 if (text === 'mr') { currentInput = memoryValue.toString(); waitingForNewValue = true; updateD(); return; }
-                if (id === 'btn-rad') { isDegrees = !isDegrees; btn.innerHTML = isDegrees ? 'Rad' : 'Deg'; return; }
+                if (id === 'btn-rad') { isDegrees = !isDegrees; targetBtn.innerHTML = isDegrees ? 'Rad' : 'Deg'; return; }
 
-                if (text === 'x2') res = val ** 2;
-                else if (text === 'x3') res = val ** 3;
-                else if (text === 'xy') { operator = '^'; previousInput = currentInput; waitingForNewValue = true; return; }
+                if (id === 'btn-x2') res = val ** 2;
+                else if (id === 'btn-x3') res = val ** 3;
+                else if (id === 'btn-xy') { operator = '^'; previousInput = currentInput; waitingForNewValue = true; return; }
                 else if (id === 'btn-ex') { if (is2nd) { operator = 'y^x'; previousInput = currentInput; waitingForNewValue = true; return; } else res = Math.exp(val); }
                 else if (id === 'btn-10x') res = is2nd ? 2 ** val : 10 ** val;
                 else if (id === 'btn-1x') res = 1 / val;
-                else if (text === '2√x') res = Math.sqrt(val);
-                else if (text === '3√x') res = Math.cbrt(val);
-                else if (text === 'y√x') { operator = 'yroot'; previousInput = currentInput; waitingForNewValue = true; return; }
+                else if (id === 'btn-2root') res = Math.sqrt(val);
+                else if (id === 'btn-3root') res = Math.cbrt(val);
+                else if (id === 'btn-yroot') { operator = 'yroot'; previousInput = currentInput; waitingForNewValue = true; return; }
                 else if (id === 'btn-ln') { if (is2nd) { operator = 'logy'; previousInput = currentInput; waitingForNewValue = true; return; } else res = Math.log(val); }
                 else if (id === 'btn-log') res = Math.log10(val);
-                else if (text === 'x!') res = factorial(val);
+                else if (id === 'btn-fact') res = factorial(val);
                 else if (id === 'btn-sin') res = is2nd ? (isDegrees ? fromRad(Math.asin(val)) : Math.asin(val)) : Math.sin(isDegrees ? toRad(val) : val);
                 else if (id === 'btn-cos') res = is2nd ? (isDegrees ? fromRad(Math.acos(val)) : Math.acos(val)) : Math.cos(isDegrees ? toRad(val) : val);
                 else if (id === 'btn-tan') res = is2nd ? (isDegrees ? fromRad(Math.atan(val)) : Math.atan(val)) : Math.tan(isDegrees ? toRad(val) : val);
-                else if (text === 'e') res = Math.E;
-                else if (text === 'EE') { operator = 'EE'; previousInput = currentInput; waitingForNewValue = true; return; }
-                else if (text === 'Rand') res = Math.random();
+                else if (id === 'btn-e') res = Math.E;
+                else if (id === 'btn-ee') { operator = 'EE'; previousInput = currentInput; waitingForNewValue = true; return; }
+                else if (id === 'btn-rand') res = Math.random();
                 else if (id === 'btn-sinh') res = is2nd ? Math.asinh(val) : Math.sinh(val);
                 else if (id === 'btn-cosh') res = is2nd ? Math.acosh(val) : Math.cosh(val);
                 else if (id === 'btn-tanh') res = is2nd ? Math.atanh(val) : Math.tanh(val);
-                else if (text === 'π') res = Math.PI;
+                else if (id === 'btn-pi') res = Math.PI;
 
                 currentInput = (Math.round(res * 1e10) / 1e10).toString();
                 waitingForNewValue = true;
@@ -1198,25 +1441,33 @@
             };
 
             document.querySelectorAll('.calc-btn').forEach(btn => {
-                btn.onclick = () => {
-                    const label = btn.getAttribute('aria-label');
-                    const textNode = btn.childNodes[0];
-                    const id = btn.id;
+                btn.onclick = (e) => {
+                    // Always try to fetch target via closest if child element clicked
+                    const targetBtn = e.target.closest('.calc-btn');
+                    if (!targetBtn) return;
+                    
+                    const label = targetBtn.getAttribute('aria-label');
+                    const textNode = targetBtn.childNodes[0];
+                    const id = targetBtn.id;
                     const text = textNode ? textNode.textContent.trim() : "";
-                    if (btn.classList.contains('kbd-btn')) return;
+                    
+                    if (targetBtn.classList.contains('kbd-btn')) return;
 
                     // CAMERA INTERCEPT
                     if (isKeyboardMode) {
-                        // Prevent arbitrary text sending if camera is alive
-                        if (isCameraOn && !isPhotoTaken && !['btn-0', 'btn-dot', 'btn-plus', 'btn-minus', 'btn-pm'].includes(id)) return; 
+                        if (isCameraOn && !isPhotoTaken && !['btn-0', 'btn-dot', 'btn-minus', 'btn-pm'].includes(id)) return; 
                         
                         if (text === '0') { if (!isCameraOn) startCamera(); else if (!isPhotoTaken) capturePhoto(); return; }
                         if (text === '.') { if (isCameraOn) stopCameraSystem(); return; }
-                        if (text === '+') { if (isPhotoTaken) { const b64 = photoPreview.src.split(',')[1]; callDeepSeek(b64); } else callDeepSeek(); return; }
+                        if (id === 'btn-equals') { 
+                            if (isPhotoTaken) { const b64 = photoPreview.src.split(',')[1]; callDeepSeek(b64); } 
+                            else if (!isCameraOn) { callDeepSeek(); } 
+                            return; 
+                        }
                         if (text === '-') { if (isPhotoTaken) retakePhoto(); return; }
                         
-                        // +/- Button Toggle Logic
                         if (id === 'btn-pm' && (isCameraOn || isPhotoTaken)) {
+                            if (!prefs.apiKey || !prefs.geminiKey) return; // Prevent toggle if keys missing
                             prefs.autoDeepSeek = !prefs.autoDeepSeek;
                             localStorage.setItem('autoDeepSeek', prefs.autoDeepSeek);
                             applyPrefs(); 
@@ -1234,30 +1485,38 @@
                             if (justReceivedAiResponse) { typedDisplay.textContent = ''; justReceivedAiResponse = false; }
                             else { const t = typedDisplay.textContent; if (t.length > 0) typedDisplay.textContent = t.slice(0, -1); }
                         }
-                        else if (text === 'AC') { typedDisplay.textContent = ''; justReceivedAiResponse = false; }
-                        else if (text === '=') appendText('\n');
-                        else if (text === '%') appendText('%'); // Insert % character
-                        else if (text === '÷') settingsPanel.style.display = 'flex';
+                        else if (id === 'btn-ac') { typedDisplay.textContent = ''; justReceivedAiResponse = false; }
+                        else if (id === 'btn-equals') { callDeepSeek(); } // Universal send in text mode
+                        else if (text === '%') appendText('%');
+                        else if (id === 'btn-plus') appendText('+');
                         else if (/[0-9]/.test(text)) appendText(text);
                         return;
                     }
 
                     // STANDARD CALC ROUTING
-                    if (btn.classList.contains('sci-btn')) { handleScientific(btn); return; }
+                    if (targetBtn.classList.contains('sci-btn')) { handleScientific(targetBtn); return; }
                     
                     if (label === 'Backspace') { if (!waitingForNewValue) currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : '0'; updateD(); }
                     else if (id === 'btn-pm') { currentInput = (parseFloat(currentInput) * -1).toString(); updateD(); }
-                    else if (text === 'AC') { 
+                    else if (id === 'btn-ac') { 
                         currentInput = '0'; previousInput = ''; operator = null; waitingForNewValue = false; 
-                        typedDisplay.textContent = ''; // Also acts as a hard reset for AI notes
+                        typedDisplay.textContent = ''; 
                         bracketStack = [];
                         justReceivedAiResponse = false;
                         updateD(); 
                     }
                     else if (text === '%') { currentInput = (parseFloat(currentInput) / 100).toString(); updateD(); }
                     else if (text === '.') { if (!currentInput.includes('.')) currentInput += '.'; updateD(); }
-                    else if (['+', '-', '×', '÷'].includes(text)) { if (operator && !waitingForNewValue) calculate(); previousInput = currentInput; operator = text; waitingForNewValue = true; }
-                    else if (text === '=') calculate();
+                    else if (['+', '-', '×', '÷'].includes(text) || id === 'btn-plus' || id === 'btn-minus' || id === 'btn-mul' || id === 'btn-div') { 
+                        let mappedOp = text;
+                        if (id === 'btn-plus') mappedOp = '+';
+                        if (id === 'btn-minus') mappedOp = '-';
+                        if (id === 'btn-mul') mappedOp = '×';
+                        if (id === 'btn-div') mappedOp = '÷';
+                        if (operator && !waitingForNewValue) calculate(); 
+                        previousInput = currentInput; operator = mappedOp; waitingForNewValue = true; 
+                    }
+                    else if (id === 'btn-equals') calculate();
                     else if (/[0-9]/.test(text)) { currentInput = (waitingForNewValue || currentInput === '0') ? text : currentInput + text; waitingForNewValue = false; updateD(); }
                 };
             });
@@ -1265,6 +1524,7 @@
             /* --- SETTINGS PERSISTENCE --- */
             document.getElementById('input-gemini-key').oninput = (e) => { prefs.geminiKey = e.target.value; applyPrefs(); localStorage.setItem('geminiKey', prefs.geminiKey); };
             document.getElementById('input-cam-ratio').onchange = (e) => { prefs.camRatio = e.target.value; applyPrefs(); localStorage.setItem('camRatio', prefs.camRatio); };
+            document.getElementById('input-cam-zoom').onchange = (e) => { prefs.camZoom = e.target.value; applyPrefs(); localStorage.setItem('camRatio', prefs.camRatio); }; // ID was typo camRatio, fixed
             document.getElementById('input-cam-zoom').onchange = (e) => { prefs.camZoom = e.target.value; applyPrefs(); localStorage.setItem('camZoom', prefs.camZoom); };
             document.getElementById('input-cam-fit').onchange = (e) => { prefs.camFit = e.target.value; applyPrefs(); localStorage.setItem('camFit', prefs.camFit); };
 
@@ -1292,7 +1552,7 @@
             document.getElementById('clear-log-btn').onclick = () => {
                 history = [];
                 localStorage.removeItem('aiHistory');
-                renderLog();
+                logPad.innerHTML = ''; 
                 const btn = document.getElementById('clear-log-btn');
                 btn.textContent = "Log Cleared!";
                 setTimeout(() => btn.textContent = "Clear History Log", 1500);
