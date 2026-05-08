@@ -10,6 +10,11 @@
     <meta name="theme-color" content="#000000">
     <title>Calculator</title>
 
+    <!-- LATEX ENGINE (KaTeX) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
     <style>
         /* --- DESIGN TOKENS --- */
         :root {
@@ -81,7 +86,6 @@
         }
 
         #calculator-app {
-            /* Removed container-type: size; to fix catastrophic Safari multi-column fragmentation bug */
             width: 100%; height: 100%;
             max-width: 450px; max-height: 974px; 
             background-color: var(--bg-color);
@@ -108,7 +112,6 @@
         }
         #camera-indicator.visible { opacity: 0.8; }
 
-        /* API Status moved down so it doesn't overlap the camera indicator */
         #api-status { 
             position: absolute; top: 85px; left: 50%; 
             transform: translateX(-50%); font-size: 10px; opacity: 0.8; 
@@ -203,12 +206,19 @@
 
         /* Output Displays */
         .display-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding: 0 var(--pad-side) calc(var(--app-h) * 0.02) var(--pad-side); overflow: hidden; z-index: 10; touch-action: pan-y; }
+        
         .typed-text-display { 
             width: 100%; color: rgba(255, 255, 255, var(--text-opacity)); 
-            font-size: calc(var(--font-screen) * 0.22); line-height: 1.3; text-align: right; 
-            max-height: 4.5em; overflow-y: auto; overflow-x: hidden; word-break: break-word; white-space: pre-wrap; 
+            font-size: calc(var(--font-screen) * 0.22); 
+            /* Increased line height to accommodate LaTeX without clipping */
+            line-height: 1.5; 
+            text-align: right; 
+            max-height: 5.5em; /* Slightly taller for fractions */
+            overflow-y: auto; overflow-x: hidden; word-break: break-word; white-space: pre-wrap; 
             margin-bottom: 8px; outline: none; user-select: text; -webkit-user-select: text; caret-color: transparent; 
             touch-action: pan-y; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+            /* Added padding to prevent tall math from clipping top/bottom */
+            padding: 8px 0;
         }
         .typed-text-display:focus { caret-color: #FFFFFF; } 
         .screen { font-size: var(--font-screen); font-weight: 300; line-height: 1; margin: 0; letter-spacing: 0.5px; color: #FFFFFF; transition: font-size 0.2s ease-out; }
@@ -266,7 +276,6 @@
 </head>
 <body>
     <div id="calculator-app">
-        <!-- Live Video & Result Previews -->
         <video id="camera-view" autoplay playsinline></video>
         <img id="photo-preview" src="">
         
@@ -398,43 +407,30 @@
         <!-- KEYPADS -->
         <div class="keypad">
             <div class="scientific-grid" id="scientific-pad">
-                <!-- Row 1 -->
                 <button class="calc-btn sci-btn">(</button>
                 <button class="calc-btn sci-btn">)</button>
                 <button class="calc-btn sci-btn">mc</button>
                 <button class="calc-btn sci-btn">m+</button>
                 <button class="calc-btn sci-btn">m-</button>
                 <button class="calc-btn sci-btn">mr</button>
-                
-                <!-- Row 2 -->
-                <button class="calc-btn sci-btn stacked-btn" id="btn-2nd">
-                    <span>2</span><span>nd</span>
-                </button>
+                <button class="calc-btn sci-btn stacked-btn" id="btn-2nd"><span>2</span><span>nd</span></button>
                 <button class="calc-btn sci-btn">x<sup>2</sup></button>
                 <button class="calc-btn sci-btn">x<sup>3</sup></button>
                 <button class="calc-btn sci-btn">x<sup>y</sup></button>
                 <button class="calc-btn sci-btn" id="btn-ex">e<sup>x</sup></button>
                 <button class="calc-btn sci-btn" id="btn-10x">10<sup>x</sup></button>
-                
-                <!-- Row 3 -->
-                <button class="calc-btn sci-btn" id="btn-1x">
-                    <sup>1</sup><span style="font-size:1.2em; font-weight:300; margin: 0 -2px;">/</span><sub>x</sub>
-                </button>
+                <button class="calc-btn sci-btn" id="btn-1x"><sup>1</sup><span style="font-size:1.2em; font-weight:300; margin: 0 -2px;">/</span><sub>x</sub></button>
                 <button class="calc-btn sci-btn"><sup>2</sup>√x</button>
                 <button class="calc-btn sci-btn"><sup>3</sup>√x</button>
                 <button class="calc-btn sci-btn"><sup>y</sup>√x</button>
                 <button class="calc-btn sci-btn" id="btn-ln">ln</button>
                 <button class="calc-btn sci-btn" id="btn-log">log<sub>10</sub></button>
-                
-                <!-- Row 4 -->
                 <button class="calc-btn sci-btn">x!</button>
                 <button class="calc-btn sci-btn" id="btn-sin">sin</button>
                 <button class="calc-btn sci-btn" id="btn-cos">cos</button>
                 <button class="calc-btn sci-btn" id="btn-tan">tan</button>
                 <button class="calc-btn sci-btn">e</button>
                 <button class="calc-btn sci-btn">EE</button>
-                
-                <!-- Row 5 -->
                 <button class="calc-btn sci-btn">Rand</button>
                 <button class="calc-btn sci-btn" id="btn-sinh">sinh</button>
                 <button class="calc-btn sci-btn" id="btn-cosh">cosh</button>
@@ -448,7 +444,6 @@
                 <div id="kbd-layout-content" style="display:contents"></div>
             </div>
             
-            <!-- Standard numeric pad -->
             <div class="basic-grid">
                 <button class="calc-btn basic-btn btn-action" aria-label="Backspace"><svg viewBox="0 0 24 24"><path d="M 8 6 H 19 C 20.1 6 21 6.9 21 8 V 16 C 21 17.1 20.1 18 19 18 H 8 L 3 12 Z" stroke-linejoin="round"></path><line x1="11" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="11" y2="15"></line></svg></button>
                 <button class="calc-btn basic-btn btn-action" id="btn-ac">AC<span class="helper-text">clear</span></button>
@@ -531,11 +526,11 @@
                 autoDeepSeek: localStorage.getItem('autoDeepSeek') === null ? true : localStorage.getItem('autoDeepSeek') === 'true',
                 model: localStorage.getItem('deepseekModel') || "deepseek-reasoner",
                 
-                // Prompts carefully constructed for pure text output
-                thinkingPrompt: localStorage.getItem('promptThinking') || "Analyze the query and provide the most correct and concise answer. If it contains math, solve using Python logic. Think deeply about the answer. Provide a short but most correct and concise answer, then explain why later. Output pure text only. Do not use any text flairs like bold, italics, or markdown formatting.",
-                reasoningPrompt: localStorage.getItem('promptReasoning') || "Analyze this input and provide a concise and most correct answer for each question. If it contains math, solve using Python logic. Think deeply about the answer. To answer, first provide the question number (if applicable), then ABCD if multiple choice, or a short, correct, concise answer for written questions. Repeat for all questions, then explain why later. Output pure text only. Do not use any text flairs like bold, italics, or markdown formatting.",
-                geminiPrompt: localStorage.getItem('promptGemini') || "Extract all text from this image into pure text as questions. Ignore layout elements, just extract the actual text content perfectly. If there are graphs, charts, diagrams, or specific colors that are relevant to the question, describe them accurately and extract any data points, labels, or visual relationships so the problem can be solved. Be comprehensive for all types of visual questions. Output pure text only. Do not use any text flairs like bold, italics, or markdown formatting.",
-                cameraPrompt: localStorage.getItem('promptCamera') || "Analyze this image and provide a concise and most correct answer for each question in the image. If it contains math, solve using Python logic. If it is hard to read important text, such as being cut off or too blurry, ask the user to retake the image. Think deeply about the answer. To answer, first provide question number if applicable, then ABCD if multiple choice, for short but most correct and concise answer for written answer, repeat for all questions- then explain why later. Output pure text only. Do not use any text flairs like bold, italics, or markdown formatting.",
+                // Prompts carefully constructed for pure text output and LaTeX support
+                thinkingPrompt: localStorage.getItem('promptThinking') || "Analyze the query and provide the most correct and concise answer. If it contains math, solve using Python logic. Think deeply about the answer. Provide a short but most correct and concise answer, then explain why later. Latex is supported. Use it for all mathematical notation using $...$ for inline or $$...$$ for display. Output pure text only. Do not use any text flairs like bold, italics, or markdown formatting.",
+                reasoningPrompt: localStorage.getItem('promptReasoning') || "Analyze this input and provide a concise and most correct answer for each question. If it contains math, solve using Python logic. Think deeply about the answer. To answer, first provide the question number (if applicable), then ABCD if multiple choice, or a short, correct, concise answer for written questions. Repeat for all questions, then explain why later. Latex is supported. Use it for all mathematical notation using $...$ for inline or $$...$$ for display. Output pure text only. Do not use any text flairs like bold, italics, or markdown formatting.",
+                geminiPrompt: localStorage.getItem('promptGemini') || "Extract all text from this image into pure text as questions. Ignore layout elements, just extract the actual text content perfectly. If there are graphs, charts, diagrams, or specific colors that are relevant to the question, describe them accurately and extract any data points, labels, or visual relationships so the problem can be solved. Be comprehensive for all types of visual questions. Latex is supported. Use it for all mathematical notation using $...$ for inline or $$...$$ for display. Output pure text only. Do not use any text flairs like bold, italics, or markdown formatting.",
+                cameraPrompt: localStorage.getItem('promptCamera') || "Analyze this image and provide a concise and most correct answer for each question in the image. If it contains math, solve using Python logic. If it is hard to read important text, such as being cut off or too blurry, ask the user to retake the image. Think deeply about the answer. To answer, first provide question number if applicable, then ABCD if multiple choice, for short but most correct and concise answer for written answer, repeat for all questions- then explain why later. Latex is supported. Use it for all mathematical notation using $...$ for inline or $$...$$ for display. Output pure text only. Do not use any text flairs like bold, italics, or markdown formatting.",
                 
                 camRatio: localStorage.getItem('camRatio') || "4:3",
                 camZoom: localStorage.getItem('camZoom') || "0.5",
@@ -662,7 +657,6 @@
                 canvas.getContext('2d').drawImage(video, 0, 0);
                 photoPreview.src = canvas.toDataURL('image/jpeg');
                 
-                // STOP the camera hardware immediately when in picture mode
                 stopStream();
                 video.srcObject = null;
                 video.classList.remove('active');
@@ -826,6 +820,7 @@
                                 const dsData = await dsRes.json();
                                 const finalResult = dsData.choices?.[0]?.message?.content || "No result.";
                                 
+                                // Log final answer to history
                                 blocks.push({ header: `SOLUTION (${prefs.model})`, text: finalResult });
                                 history.push({ blocks });
                                 localStorage.setItem('aiHistory', JSON.stringify(history));
@@ -920,6 +915,10 @@
 
                         apiStatus.textContent = "COMPLETE";
                         justReceivedAiResponse = true;
+                        
+                        // RENDER MATH (LATEX)
+                        renderMathInElement(typedDisplay, { delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}] });
+
                         setTimeout(() => apiStatus.style.display = "none", 2000);
                         stopCameraSystem();
 
@@ -970,6 +969,10 @@
                         apiStatus.textContent = "COMPLETE";
                         
                         justReceivedAiResponse = true;
+                        
+                        // RENDER MATH (LATEX)
+                        renderMathInElement(typedDisplay, { delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}] });
+
                         setTimeout(() => apiStatus.style.display = "none", 2000);
                     }
                 } catch (e) {
@@ -1014,6 +1017,9 @@
                     logPad.appendChild(div);
                 });
                 
+                // RENDER MATH IN LOG TOO
+                renderMathInElement(logPad, { delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}] });
+
                 // Auto-scroll to the bottom for the newest log
                 setTimeout(() => {
                     logPad.scrollTop = logPad.scrollHeight;
