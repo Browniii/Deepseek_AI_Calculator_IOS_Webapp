@@ -51,7 +51,6 @@
         }
 
         /* --- SLEEK MODERN SCROLLBARS --- */
-        /* Global ultra-thin scrollbar for main views */
         ::-webkit-scrollbar {
             width: 3px; height: 3px;
         }
@@ -74,10 +73,9 @@
             height: 100vh; width: 100vw;
             display: flex; justify-content: center; align-items: center; 
             overflow: hidden; user-select: none; -webkit-user-select: none;
-            touch-action: none; /* Disable all zooming and panning on document body */
+            touch-action: none;
         }
 
-        /* Container ensures calculator maintains phone proportions */
         #calculator-app {
             container-type: size;
             width: 100%; height: 100%;
@@ -90,7 +88,7 @@
             overflow: hidden;
         }
 
-        /* --- VISUAL OVERLAYS (Camera & Photo) --- */
+        /* --- VISUAL OVERLAYS --- */
         #camera-view, #photo-preview {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover; display: none; z-index: 50; pointer-events: none;
@@ -98,7 +96,6 @@
         #camera-view.active { display: block; opacity: var(--cam-opacity); }
         #photo-preview.active { display: block; opacity: var(--pic-opacity); }
 
-        /* UI Indicators */
         #camera-indicator {
             position: absolute; top: 50px; left: 50%;
             transform: translateX(-50%); font-size: 10px; text-transform: uppercase;
@@ -107,7 +104,15 @@
         }
         #camera-indicator.visible { opacity: 0.8; }
 
-        /* --- OVERLAY PANELS (Apple-Level Glassmorphism) --- */
+        /* API Status moved down so it doesn't overlap the camera indicator */
+        #api-status { 
+            position: absolute; top: 85px; left: 50%; 
+            transform: translateX(-50%); font-size: 10px; opacity: 0.8; 
+            letter-spacing: 1.2px; display: none; color: var(--operator-orange); 
+            font-weight: bold; width: 80%; text-align: center; pointer-events: none; z-index: 100; 
+        }
+
+        /* --- OVERLAY PANELS --- */
         @keyframes modalSlideUp {
             0% { opacity: 0; transform: translateY(40px) scale(0.95); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -138,8 +143,6 @@
             font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; 
             letter-spacing: 1px; color: #fff; margin-bottom: 4px;
         }
-        
-        /* Modern Apple-like Inputs */
         .setting-item input[type="text"], .setting-item input[type="password"], .setting-item select, .setting-item textarea {
             width: 100%; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.05); 
             color: white; padding: 12px 14px; border-radius: 12px; font-size: 14px; outline: none; 
@@ -148,31 +151,13 @@
         .setting-item input:focus, .setting-item select:focus, .setting-item textarea:focus {
             border-color: rgba(255, 147, 0, 0.6); box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 0 0 3px rgba(255, 147, 0, 0.15); background: rgba(0,0,0,0.4);
         }
-        
-        /* Specialized inside-textarea scrollbar to prevent cutting off at rounded corners */
-        .setting-item textarea { 
-            height: 80px; resize: none; font-family: inherit; font-size: 13px; line-height: 1.4; 
-        }
-        .setting-item textarea::-webkit-scrollbar {
-            width: 14px; /* Wider to allow border hack */
-        }
-        .setting-item textarea::-webkit-scrollbar-track {
-            background: transparent;
-            margin: 6px 0; /* Keeps track away from top/bottom rounded corners */
-        }
-        .setting-item textarea::-webkit-scrollbar-thumb {
-            background-color: rgba(255, 255, 255, 0.25);
-            border-radius: 10px;
-            border: 4px solid transparent; /* Transparent border creates padding inside the track */
-            background-clip: padding-box;
-        }
-        .setting-item textarea::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-
+        .setting-item textarea { height: 80px; resize: none; font-family: inherit; font-size: 13px; line-height: 1.4; }
+        .setting-item textarea::-webkit-scrollbar { width: 14px; }
+        .setting-item textarea::-webkit-scrollbar-track { background: transparent; margin: 6px 0; }
+        .setting-item textarea::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.25); border-radius: 10px; border: 4px solid transparent; background-clip: padding-box; }
+        .setting-item textarea::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.4); }
         .setting-item.row { flex-direction: row; justify-content: space-between; align-items: center; }
         
-        /* Modern Toggle Switch */
         input[type="checkbox"] {
             -webkit-appearance: none; appearance: none;
             width: 50px; height: 30px; background: rgba(255,255,255,0.15);
@@ -186,8 +171,6 @@
         }
         input[type="checkbox"]:checked { background: var(--operator-orange); }
         input[type="checkbox"]:checked::after { transform: translateX(20px); }
-
-        /* Modern Range Slider */
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: rgba(255, 255, 255, 0.15); border-radius: 5px; outline: none; margin: 10px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);}
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); cursor: pointer; transition: transform 0.1s; }
         input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
@@ -216,57 +199,34 @@
 
         /* Output Displays */
         .display-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding: 0 var(--pad-side) 2cqh var(--pad-side); overflow: hidden; z-index: 10; touch-action: pan-y; }
-        
-        /* Fixed: strictly no horizontal scroll and clean word wrapping */
         .typed-text-display { 
-            width: 100%; 
-            color: rgba(255, 255, 255, var(--text-opacity)); 
-            font-size: calc(var(--font-screen) * 0.22); 
-            line-height: 1.3; 
-            text-align: right; 
-            max-height: 4.5em; 
-            overflow-y: auto; 
-            overflow-x: hidden; 
-            word-break: break-word; 
-            white-space: pre-wrap; 
-            margin-bottom: 8px; 
-            outline: none; 
-            user-select: text; 
-            -webkit-user-select: text; 
-            caret-color: transparent; 
-            touch-action: pan-y;
-            scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+            width: 100%; color: rgba(255, 255, 255, var(--text-opacity)); 
+            font-size: calc(var(--font-screen) * 0.22); line-height: 1.3; text-align: right; 
+            max-height: 4.5em; overflow-y: auto; overflow-x: hidden; word-break: break-word; white-space: pre-wrap; 
+            margin-bottom: 8px; outline: none; user-select: text; -webkit-user-select: text; caret-color: transparent; 
+            touch-action: pan-y; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
         }
         .typed-text-display:focus { caret-color: #FFFFFF; } 
-
-        /* FIX: Increased letter spacing slightly to feel relaxed and modern */
         .screen { font-size: var(--font-screen); font-weight: 300; line-height: 1; margin: 0; letter-spacing: 0.5px; color: #FFFFFF; transition: font-size 0.2s ease-out; }
 
         /* Keypads */
         .keypad { display: flex; flex-direction: column; gap: var(--gap-btn); margin-top: auto; position: relative; z-index: 10; }
         
-        /* Fancy Interactive Animations for Buttons */
         .calc-btn { 
             border: none; outline: none; cursor: pointer; color: #FFFFFF; 
             border-radius: 100px; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; 
             height: var(--btn-height); position: relative; 
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-            touch-action: manipulation; /* Block double tap zoom on buttons */
+            touch-action: manipulation;
         }
-        .calc-btn:active { 
-            transform: scale(0.85); 
-            filter: brightness(1.4); 
-        }
+        .calc-btn:active { transform: scale(0.85); filter: brightness(1.4); }
         .calc-btn svg { width: 45%; height: 45%; stroke: currentColor; fill: none; stroke-width: 1.5; }
         .helper-text { position: absolute; bottom: 10%; font-size: 9px; text-transform: lowercase; opacity: 0.25; display: none; }
 
-        /* Scientific Grid Enhancements */
         .scientific-grid { display: grid; grid-template-columns: repeat(6, var(--btn-upper-w)); justify-content: center; gap: var(--gap-btn); transition: opacity 0.3s; }
         .sci-btn { background-color: var(--sci-dark-grey); width: var(--btn-upper-w); font-size: var(--font-upper); white-space: nowrap; }
         .sci-btn sup, .sci-btn sub { font-size: 0.6em; pointer-events: none; }
-        
-        /* 2nd Button vertical stacking layout */
         .stacked-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 0.9; }
         .stacked-btn span:first-child { font-size: 1em; transform: translateY(2px); }
         .stacked-btn span:last-child { font-size: 0.65em; transform: translateY(-2px); }
@@ -277,30 +237,16 @@
         .btn-operator { background-color: var(--operator-orange); font-size: var(--font-action); }
 
         /* --- LIQUID GLASS MODE --- */
-        /* Applies intense blur, saturation, and dynamic lighting borders */
-        .liquid-glass-mode .calc-btn, 
-        .liquid-glass-mode .header-btn,
-        .liquid-glass-mode .overlay-panel {
+        .liquid-glass-mode .calc-btn, .liquid-glass-mode .header-btn, .liquid-glass-mode .overlay-panel {
             background-color: rgba(30, 30, 30, 0.4) !important;
-            backdrop-filter: blur(25px) saturate(200%);
-            -webkit-backdrop-filter: blur(25px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #FFFFFF !important;
+            backdrop-filter: blur(25px) saturate(200%); -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.15); color: #FFFFFF !important;
             box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-        .liquid-glass-mode .btn-operator {
-            background-color: rgba(255, 147, 0, 0.4) !important;
-            border-color: rgba(255, 147, 0, 0.5) !important;
-        }
-        .liquid-glass-mode .btn-action {
-            background-color: rgba(255, 255, 255, 0.2) !important;
-        }
-        .liquid-glass-mode .kbd-btn.shift-active {
-            background-color: rgba(255, 255, 255, 0.5) !important;
-        }
-        .liquid-glass-mode .kbd-btn {
-            background-color: rgba(30, 30, 30, 0.4) !important;
-        }
+        .liquid-glass-mode .btn-operator { background-color: rgba(255, 147, 0, 0.4) !important; border-color: rgba(255, 147, 0, 0.5) !important; }
+        .liquid-glass-mode .btn-action { background-color: rgba(255, 255, 255, 0.2) !important; }
+        .liquid-glass-mode .kbd-btn.shift-active { background-color: rgba(255, 255, 255, 0.5) !important; }
+        .liquid-glass-mode .kbd-btn { background-color: rgba(30, 30, 30, 0.4) !important; }
 
         /* --- MODE OVERRIDES --- */
         .camera-essential { z-index: 60 !important; }
@@ -312,12 +258,10 @@
         .kbd-btn { background-color: var(--sci-dark-grey); border-radius: calc(var(--btn-height) * 0.2); flex: 1; font-size: calc(var(--font-upper) * 1.25); text-transform: lowercase; font-weight: 400; color: #FFF; pointer-events: auto; }
         .kbd-btn.shift-active { background-color: #FFFFFF; color: #000000; }
         
-        #api-status { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-size: 10px; opacity: 0.8; letter-spacing: 1.2px; display: none; color: var(--operator-orange); font-weight: bold; width: 80%; text-align: center; pointer-events: none; z-index: 100; }
     </style>
 </head>
 <body>
     <div id="calculator-app">
-        <!-- Live Video & Result Previews -->
         <video id="camera-view" autoplay playsinline></video>
         <img id="photo-preview" src="">
         
@@ -328,8 +272,12 @@
         <div id="settings-panel" class="overlay-panel">
             <div class="settings-header">Preferences</div>
             <div class="setting-item">
-                <label>DeepSeek API Key</label>
-                <input type="password" id="input-api-key" placeholder="Paste your key here">
+                <label>Gemini API Key (For Images)</label>
+                <input type="password" id="input-gemini-key" placeholder="Paste your Gemini key here">
+            </div>
+            <div class="setting-item">
+                <label>DeepSeek API Key (For Text)</label>
+                <input type="password" id="input-api-key" placeholder="Paste your DeepSeek key here">
             </div>
             <div class="setting-item">
                 <label>Model Mode</label>
@@ -338,7 +286,6 @@
                     <option value="deepseek-chat">Thinking (Chat)</option>
                 </select>
             </div>
-            
             <div class="setting-item">
                 <label>Thinking Instructions (Chat)</label>
                 <textarea id="prompt-thinking" placeholder="Instructions..."></textarea>
@@ -351,8 +298,6 @@
                 <label>Camera/Vision Instructions</label>
                 <textarea id="prompt-camera" placeholder="Instructions..."></textarea>
             </div>
-
-            <!-- NEW CAMERA HARDWARE SETTINGS -->
             <div class="setting-item">
                 <label>Camera Aspect Ratio</label>
                 <select id="input-cam-ratio">
@@ -361,7 +306,7 @@
                 </select>
             </div>
             <div class="setting-item">
-                <label>Camera Hardware Zoom (If Supported)</label>
+                <label>Camera Hardware Zoom</label>
                 <select id="input-cam-zoom">
                     <option value="0.5">0.5x (Ultra-wide)</option>
                     <option value="1">1x (Standard)</option>
@@ -375,7 +320,6 @@
                     <option value="contain">Fit to Screen</option>
                 </select>
             </div>
-
             <div class="setting-item">
                 <label>Text Above Opacity: <span id="label-text-opacity">20</span>%</label>
                 <input type="range" id="input-text-opacity" min="0" max="100" value="20">
@@ -426,43 +370,30 @@
         <!-- KEYPADS -->
         <div class="keypad">
             <div class="scientific-grid" id="scientific-pad">
-                <!-- Row 1 -->
                 <button class="calc-btn sci-btn">(</button>
                 <button class="calc-btn sci-btn">)</button>
                 <button class="calc-btn sci-btn">mc</button>
                 <button class="calc-btn sci-btn">m+</button>
                 <button class="calc-btn sci-btn">m-</button>
                 <button class="calc-btn sci-btn">mr</button>
-                
-                <!-- Row 2 -->
-                <button class="calc-btn sci-btn stacked-btn" id="btn-2nd">
-                    <span>2</span><span>nd</span>
-                </button>
+                <button class="calc-btn sci-btn stacked-btn" id="btn-2nd"><span>2</span><span>nd</span></button>
                 <button class="calc-btn sci-btn">x<sup>2</sup></button>
                 <button class="calc-btn sci-btn">x<sup>3</sup></button>
                 <button class="calc-btn sci-btn">x<sup>y</sup></button>
                 <button class="calc-btn sci-btn" id="btn-ex">e<sup>x</sup></button>
                 <button class="calc-btn sci-btn" id="btn-10x">10<sup>x</sup></button>
-                
-                <!-- Row 3 -->
-                <button class="calc-btn sci-btn" id="btn-1x">
-                    <sup>1</sup><span style="font-size:1.2em; font-weight:300; margin: 0 -2px;">/</span><sub>x</sub>
-                </button>
+                <button class="calc-btn sci-btn" id="btn-1x"><sup>1</sup><span style="font-size:1.2em; font-weight:300; margin: 0 -2px;">/</span><sub>x</sub></button>
                 <button class="calc-btn sci-btn"><sup>2</sup>√x</button>
                 <button class="calc-btn sci-btn"><sup>3</sup>√x</button>
                 <button class="calc-btn sci-btn"><sup>y</sup>√x</button>
                 <button class="calc-btn sci-btn" id="btn-ln">ln</button>
                 <button class="calc-btn sci-btn" id="btn-log">log<sub>10</sub></button>
-                
-                <!-- Row 4 -->
                 <button class="calc-btn sci-btn">x!</button>
                 <button class="calc-btn sci-btn" id="btn-sin">sin</button>
                 <button class="calc-btn sci-btn" id="btn-cos">cos</button>
                 <button class="calc-btn sci-btn" id="btn-tan">tan</button>
                 <button class="calc-btn sci-btn">e</button>
                 <button class="calc-btn sci-btn">EE</button>
-                
-                <!-- Row 5 -->
                 <button class="calc-btn sci-btn">Rand</button>
                 <button class="calc-btn sci-btn" id="btn-sinh">sinh</button>
                 <button class="calc-btn sci-btn" id="btn-cosh">cosh</button>
@@ -476,11 +407,12 @@
                 <div id="kbd-layout-content" style="display:contents"></div>
             </div>
             
-            <!-- Standard numeric pad -->
             <div class="basic-grid">
                 <button class="calc-btn basic-btn btn-action" aria-label="Backspace"><svg viewBox="0 0 24 24"><path d="M 8 6 H 19 C 20.1 6 21 6.9 21 8 V 16 C 21 17.1 20.1 18 19 18 H 8 L 3 12 Z" stroke-linejoin="round"></path><line x1="11" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="11" y2="15"></line></svg></button>
-                <button class="calc-btn basic-btn btn-action" id="btn-ac">AC<span class="helper-text">space</span></button>
-                <button class="calc-btn basic-btn btn-action">%<span class="helper-text">clear</span></button>
+                <!-- Updated AC Helper to just say clear -->
+                <button class="calc-btn basic-btn btn-action" id="btn-ac">AC<span class="helper-text">clear</span></button>
+                <!-- Removed clear helper from % -->
+                <button class="calc-btn basic-btn btn-action">%</button>
                 <button class="calc-btn basic-btn btn-operator" id="btn-settings-trigger">÷<span class="helper-text">settings</span></button>
                 <button class="calc-btn basic-btn btn-number" id="btn-7">7</button><button class="calc-btn basic-btn btn-number" id="btn-8">8</button><button class="calc-btn basic-btn btn-number" id="btn-9">9</button><button class="calc-btn basic-btn btn-operator">×</button>
                 <button class="calc-btn basic-btn btn-number" id="btn-4">4</button><button class="calc-btn basic-btn btn-number" id="btn-5">5</button><button class="calc-btn basic-btn btn-number" id="btn-6">6</button>
@@ -495,10 +427,9 @@
         </div>
     </div>
 
-    <!-- MAIN APPLICATION SCRIPT -->
+    <!-- SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            /* --- ELEMENT DEFINITIONS --- */
             const video = document.getElementById('camera-view');
             const photoPreview = document.getElementById('photo-preview');
             const indicator = document.getElementById('camera-indicator');
@@ -516,19 +447,18 @@
             const appWrapper = document.getElementById('calculator-app');
             const root = document.documentElement;
 
-            /* --- GLOBAL APP STATE --- */
             let history = JSON.parse(localStorage.getItem('aiHistory')) || [];
             let currentInput = '0', previousInput = '', operator = null, waitingForNewValue = false;
             let isKeyboardMode = false, isLogMode = false, isShift = false, keyboardState = 'alpha';
             let isCameraOn = false, isPhotoTaken = false, stream = null;
+            // State variable to detect if we need to wipe response on next keystroke
+            let justReceivedAiResponse = false;
             
-            // Scientific State
             let memoryValue = 0;
             let isDegrees = true;
             let is2nd = false;
             let bracketStack = [];
 
-            /* --- USER PREFERENCES --- */
             const prefs = {
                 textOpacity: localStorage.getItem('textOpacity') || 20,
                 kbdOpacity: localStorage.getItem('kbdOpacity') || 10,
@@ -537,6 +467,7 @@
                 picOpacity: localStorage.getItem('picOpacity') || 15,
                 overlay: localStorage.getItem('overlay') === null ? true : localStorage.getItem('overlay') === 'true',
                 glassMode: localStorage.getItem('glassMode') === 'true' || false,
+                geminiKey: localStorage.getItem('geminiKey') || "",
                 apiKey: localStorage.getItem('deepseekKey') || "",
                 model: localStorage.getItem('deepseekModel') || "deepseek-reasoner",
                 thinkingPrompt: localStorage.getItem('promptThinking') || "Analyze the query and provide the most correct and concise answer. If it contains math, solve using Python logic. Think in thought about the answer deeply. Provide a short but most correct and concise answer, then explain why later.",
@@ -547,14 +478,10 @@
                 camFit: localStorage.getItem('camFit') || "cover"
             };
 
-            /* --- UI ENGINE --- */
             const updateD = () => { 
                 let s = currentInput; 
-                // Allow longer string representation before raw cut off
                 if (s.length > 15 && !s.includes('e')) s = s.substring(0, 15); 
                 display.textContent = s; 
-                
-                // Auto-adjust scale only when number hits the left padding edge (approx 9 digits)
                 if (s.length > 9) {
                     display.style.fontSize = `calc(var(--font-screen) * ${9 / s.length})`;
                 } else {
@@ -582,6 +509,7 @@
                 
                 document.getElementById('input-overlay-toggle').checked = prefs.overlay;
                 document.getElementById('input-glass-toggle').checked = prefs.glassMode;
+                document.getElementById('input-gemini-key').value = prefs.geminiKey;
                 document.getElementById('input-api-key').value = prefs.apiKey;
                 document.getElementById('input-model-mode').value = prefs.model;
                 
@@ -604,7 +532,6 @@
             };
 
             const updateGlassMode = () => {
-                // Liquid glass applies to the entire UI regardless of camera state
                 if (prefs.glassMode) {
                     appWrapper.classList.add('liquid-glass-mode');
                 } else {
@@ -612,41 +539,26 @@
                 }
             }
 
-            /* --- CAMERA ENGINE --- */
             const stopStream = () => {
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                    stream = null;
-                }
+                if (stream) { stream.getTracks().forEach(track => track.stop()); stream = null; }
             };
 
             const startCamera = async () => {
                 try {
                     const ratioVal = prefs.camRatio === '4:3' ? 4/3 : 16/9;
-                    const constraints = {
-                        video: {
-                            facingMode: 'environment',
-                            aspectRatio: { ideal: ratioVal }
-                        }
-                    };
-                    
+                    const constraints = { video: { facingMode: 'environment', aspectRatio: { ideal: ratioVal } } };
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
-                    
-                    // Try to apply hardware zoom if supported by the browser track
                     try {
                         const track = stream.getVideoTracks()[0];
                         if (track.getCapabilities) {
                             const caps = track.getCapabilities();
                             if (caps.zoom) {
                                 let z = parseFloat(prefs.camZoom);
-                                // Ensure requested zoom is within hardware limits
                                 const safeZoom = Math.max(caps.zoom.min, Math.min(z, caps.zoom.max));
                                 await track.applyConstraints({ advanced: [{ zoom: safeZoom }] });
                             }
                         }
-                    } catch (e) {
-                        console.log("Hardware zoom constraints skipped or unsupported", e);
-                    }
+                    } catch (e) { console.log("Zoom not supported", e); }
 
                     video.srcObject = stream;
                     video.classList.add('active');
@@ -675,7 +587,6 @@
                 canvas.getContext('2d').drawImage(video, 0, 0);
                 photoPreview.src = canvas.toDataURL('image/jpeg');
                 
-                // STOP the camera hardware immediately when in picture mode
                 stopStream();
                 video.srcObject = null;
                 video.classList.remove('active');
@@ -687,10 +598,7 @@
                 updateGlassMode();
             };
 
-            const retakePhoto = async () => {
-                photoPreview.classList.remove('active');
-                await startCamera(); 
-            };
+            const retakePhoto = async () => { photoPreview.classList.remove('active'); await startCamera(); };
 
             const stopCameraSystem = () => {
                 stopStream();
@@ -710,22 +618,14 @@
 
             const bringEssentialsToFront = (active) => {
                 const essentials = [
-                    document.getElementById('btn-0'),
-                    document.getElementById('btn-plus'),
-                    document.getElementById('btn-minus'),
-                    document.getElementById('btn-dot')
+                    document.getElementById('btn-0'), document.getElementById('btn-plus'),
+                    document.getElementById('btn-minus'), document.getElementById('btn-dot')
                 ];
-                essentials.forEach(btn => {
-                    if (active) btn.classList.add('camera-essential');
-                    else btn.classList.remove('camera-essential');
-                });
+                essentials.forEach(btn => { if (active) btn.classList.add('camera-essential'); else btn.classList.remove('camera-essential'); });
                 helpers.forEach(h => {
                     const parentId = h.parentElement.id;
-                    if (active && !['btn-0', 'btn-plus', 'btn-minus', 'btn-dot'].includes(parentId)) {
-                        h.style.visibility = 'hidden';
-                    } else {
-                        h.style.visibility = 'visible';
-                    }
+                    if (active && !['btn-0', 'btn-plus', 'btn-minus', 'btn-dot'].includes(parentId)) { h.style.visibility = 'hidden'; } 
+                    else { h.style.visibility = 'visible'; }
                 });
             };
 
@@ -744,10 +644,18 @@
                 }
             };
 
-            /* --- AI PIPELINE --- */
             const callDeepSeek = async (imageB64 = null) => {
-                if (!prefs.apiKey) {
+                const userContent = typedDisplay.textContent.trim();
+
+                if (!imageB64 && !prefs.apiKey) {
                     apiStatus.textContent = "input deepseek key in settings";
+                    apiStatus.style.display = "block";
+                    setTimeout(() => apiStatus.style.display = "none", 4000);
+                    return;
+                }
+                
+                if (imageB64 && !prefs.geminiKey && !prefs.apiKey) {
+                    apiStatus.textContent = "input gemini or deepseek key";
                     apiStatus.style.display = "block";
                     setTimeout(() => apiStatus.style.display = "none", 4000);
                     return;
@@ -767,16 +675,29 @@
                         systemPrompt = prefs.thinkingPrompt;
                     }
 
-                    const userContent = typedDisplay.textContent.trim();
-                    
                     if (imageB64) {
-                        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                contents: [{ parts: [{ text: systemPrompt + "\n\n" + userContent }, { inlineData: { mimeType: "image/jpeg", data: imageB64 } }] }]
-                            })
-                        });
+                        if (prefs.geminiKey) {
+                            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${prefs.geminiKey}`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    contents: [{ parts: [{ text: systemPrompt + "\n\n" + userContent }, { inlineData: { mimeType: "image/jpeg", data: imageB64 } }] }]
+                                })
+                            });
+                        } else {
+                            // Fallback to OpenAI-style vision payload for DeepSeek/compatible endpoints
+                            response = await fetch("https://api.deepseek.com/chat/completions", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${prefs.apiKey}` },
+                                body: JSON.stringify({
+                                    model: prefs.model, 
+                                    messages: [{ role: "user", content: [
+                                        { type: "text", text: systemPrompt + "\n\n" + userContent },
+                                        { type: "image_url", image_url: { url: "data:image/jpeg;base64," + imageB64 } }
+                                    ]}]
+                                })
+                            });
+                        }
                     } else {
                         response = await fetch("https://api.deepseek.com/chat/completions", {
                             method: "POST",
@@ -787,13 +708,22 @@
 
                     if (!response.ok) throw new Error();
                     const data = await response.json();
-                    const result = imageB64 ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+                    
+                    let result = "";
+                    if (imageB64 && prefs.geminiKey) {
+                        result = data.candidates?.[0]?.content?.parts?.[0]?.text || "No result.";
+                    } else {
+                        result = data.choices?.[0]?.message?.content || "No result.";
+                    }
                     
                     history.push({ prompt: imageB64 ? "[Vision Task]" : userContent, response: result });
                     localStorage.setItem('aiHistory', JSON.stringify(history));
                     
                     typedDisplay.textContent = result;
                     apiStatus.textContent = "COMPLETE";
+                    
+                    justReceivedAiResponse = true; // Flag to clear on next type
+
                     setTimeout(() => apiStatus.style.display = "none", 2000);
                     if (imageB64) stopCameraSystem();
                 } catch (e) {
@@ -802,7 +732,6 @@
                 }
             };
 
-            /* --- EVENT HANDLERS --- */
             toggleKeyboardBtn.onclick = () => { isKeyboardMode = !isKeyboardMode; isLogMode = false; logPad.classList.remove('active'); kbdGrid.classList.toggle('active', isKeyboardMode); helpers.forEach(h => h.style.display = isKeyboardMode ? 'block' : 'none'); if (isCameraOn) stopCameraSystem(); applyPrefs(); if (isKeyboardMode) renderKeyboard(); };
             toggleLogBtn.onclick = () => { isLogMode = !isLogMode; isKeyboardMode = false; kbdGrid.classList.remove('active'); logPad.classList.toggle('active', isLogMode); helpers.forEach(h => h.style.display = isLogMode ? 'block' : 'none'); if (isCameraOn) stopCameraSystem(); applyPrefs(); if (isLogMode) renderLog(); };
 
@@ -838,18 +767,29 @@
                 });
             };
 
+            const appendText = (char) => {
+                if (justReceivedAiResponse) {
+                    typedDisplay.textContent = '';
+                    justReceivedAiResponse = false;
+                }
+                typedDisplay.appendChild(document.createTextNode(char));
+                typedDisplay.scrollTop = typedDisplay.scrollHeight;
+            };
+
             const handleKbdPress = (key) => {
                 if (key === 'SHIFT') { isShift = !isShift; renderKeyboard(); }
                 else if (key === '123') { keyboardState = 'num'; isShift = false; renderKeyboard(); }
                 else if (key === 'ABC') { keyboardState = 'alpha'; isShift = false; renderKeyboard(); }
                 else if (key === '#+=') { keyboardState = 'sym'; renderKeyboard(); }
-                else if (key === 'BS') { const t = typedDisplay.textContent; if (t.length > 0) typedDisplay.textContent = t.slice(0, -1); }
-                else if (key === 'SPACE') typedDisplay.appendChild(document.createTextNode(' '));
-                else if (key === 'RETURN') typedDisplay.appendChild(document.createTextNode('\n'));
-                else { let char = isShift && keyboardState === 'alpha' ? key.toUpperCase() : key; typedDisplay.appendChild(document.createTextNode(char)); typedDisplay.scrollTop = typedDisplay.scrollHeight; if (isShift) { isShift = false; renderKeyboard(); } }
+                else if (key === 'BS') { 
+                    if (justReceivedAiResponse) { typedDisplay.textContent = ''; justReceivedAiResponse = false; }
+                    else { const t = typedDisplay.textContent; if (t.length > 0) typedDisplay.textContent = t.slice(0, -1); }
+                }
+                else if (key === 'SPACE') appendText(' ');
+                else if (key === 'RETURN') appendText('\n');
+                else { let char = isShift && keyboardState === 'alpha' ? key.toUpperCase() : key; appendText(char); if (isShift) { isShift = false; renderKeyboard(); } }
             };
 
-            // SCIENTIFIC MATH LOGIC
             const handleScientific = (btn) => {
                 let val = parseFloat(currentInput), res = val;
                 const id = btn.id;
@@ -879,46 +819,24 @@
                     return;
                 }
 
-                if (text === '(') {
-                    bracketStack.push({prev: previousInput, op: operator});
-                    previousInput = ''; operator = null; currentInput = '0'; waitingForNewValue = true; return;
-                }
-                if (text === ')') {
-                    calculate(); 
-                    if (bracketStack.length > 0) {
-                        let state = bracketStack.pop();
-                        previousInput = state.prev; operator = state.op;
-                        calculate(); 
-                    }
-                    return;
-                }
+                if (text === '(') { bracketStack.push({prev: previousInput, op: operator}); previousInput = ''; operator = null; currentInput = '0'; waitingForNewValue = true; return; }
+                if (text === ')') { calculate(); if (bracketStack.length > 0) { let state = bracketStack.pop(); previousInput = state.prev; operator = state.op; calculate(); } return; }
                 if (text === 'mc') { memoryValue = 0; waitingForNewValue = true; return; }
                 if (text === 'm+') { memoryValue += val; waitingForNewValue = true; return; }
                 if (text === 'm-') { memoryValue -= val; waitingForNewValue = true; return; }
                 if (text === 'mr') { currentInput = memoryValue.toString(); waitingForNewValue = true; updateD(); return; }
-
-                if (id === 'btn-rad') {
-                    isDegrees = !isDegrees;
-                    btn.innerHTML = isDegrees ? 'Rad' : 'Deg';
-                    return;
-                }
+                if (id === 'btn-rad') { isDegrees = !isDegrees; btn.innerHTML = isDegrees ? 'Rad' : 'Deg'; return; }
 
                 if (text === 'x2') res = val ** 2;
                 else if (text === 'x3') res = val ** 3;
                 else if (text === 'xy') { operator = '^'; previousInput = currentInput; waitingForNewValue = true; return; }
-                else if (id === 'btn-ex') {
-                    if (is2nd) { operator = 'y^x'; previousInput = currentInput; waitingForNewValue = true; return; }
-                    else res = Math.exp(val);
-                }
+                else if (id === 'btn-ex') { if (is2nd) { operator = 'y^x'; previousInput = currentInput; waitingForNewValue = true; return; } else res = Math.exp(val); }
                 else if (id === 'btn-10x') res = is2nd ? 2 ** val : 10 ** val;
                 else if (id === 'btn-1x') res = 1 / val;
                 else if (text === '2√x') res = Math.sqrt(val);
                 else if (text === '3√x') res = Math.cbrt(val);
                 else if (text === 'y√x') { operator = 'yroot'; previousInput = currentInput; waitingForNewValue = true; return; }
-                else if (id === 'btn-ln') { 
-                    if (is2nd) { operator = 'logy'; previousInput = currentInput; waitingForNewValue = true; return; }
-                    else res = Math.log(val);
-                }
+                else if (id === 'btn-ln') { if (is2nd) { operator = 'logy'; previousInput = currentInput; waitingForNewValue = true; return; } else res = Math.log(val); }
                 else if (id === 'btn-log') res = Math.log10(val);
                 else if (text === 'x!') res = factorial(val);
                 else if (id === 'btn-sin') res = is2nd ? (isDegrees ? fromRad(Math.asin(val)) : Math.asin(val)) : Math.sin(isDegrees ? toRad(val) : val);
@@ -971,12 +889,15 @@
                     }
 
                     if (isKeyboardMode || isLogMode) {
-                        if (label === 'Backspace') { const t = typedDisplay.textContent; if (t.length > 0) typedDisplay.textContent = t.slice(0, -1); }
-                        else if (text === 'AC') { typedDisplay.textContent = ''; }
-                        else if (text === '=') typedDisplay.appendChild(document.createTextNode('\n'));
-                        else if (text === '%') typedDisplay.textContent = '';
+                        if (label === 'Backspace') { 
+                            if (justReceivedAiResponse) { typedDisplay.textContent = ''; justReceivedAiResponse = false; }
+                            else { const t = typedDisplay.textContent; if (t.length > 0) typedDisplay.textContent = t.slice(0, -1); }
+                        }
+                        else if (text === 'AC') { typedDisplay.textContent = ''; justReceivedAiResponse = false; }
+                        else if (text === '=') appendText('\n');
+                        else if (text === '%') appendText('%'); // Insert % character
                         else if (text === '÷') settingsPanel.style.display = 'flex';
-                        else if (/[0-9]/.test(text)) typedDisplay.appendChild(document.createTextNode(text));
+                        else if (/[0-9]/.test(text)) appendText(text);
                         return;
                     }
 
@@ -989,6 +910,7 @@
                         currentInput = '0'; previousInput = ''; operator = null; waitingForNewValue = false; 
                         typedDisplay.textContent = ''; // Also acts as a hard reset for AI notes
                         bracketStack = [];
+                        justReceivedAiResponse = false;
                         updateD(); 
                     }
                     else if (text === '%') { currentInput = (parseFloat(currentInput) / 100).toString(); updateD(); }
@@ -1000,6 +922,7 @@
             });
 
             /* --- SETTINGS PERSISTENCE --- */
+            document.getElementById('input-gemini-key').oninput = (e) => { prefs.geminiKey = e.target.value; applyPrefs(); localStorage.setItem('geminiKey', prefs.geminiKey); };
             document.getElementById('input-cam-ratio').onchange = (e) => { prefs.camRatio = e.target.value; applyPrefs(); localStorage.setItem('camRatio', prefs.camRatio); };
             document.getElementById('input-cam-zoom').onchange = (e) => { prefs.camZoom = e.target.value; applyPrefs(); localStorage.setItem('camZoom', prefs.camZoom); };
             document.getElementById('input-cam-fit').onchange = (e) => { prefs.camFit = e.target.value; applyPrefs(); localStorage.setItem('camFit', prefs.camFit); };
