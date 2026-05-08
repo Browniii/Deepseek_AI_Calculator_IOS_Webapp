@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Updated to 'black' for a solid pure black top bar -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Calculator">
     <meta name="theme-color" content="#000000">
     <title>Calculator</title>
@@ -27,7 +28,8 @@
 
             /* Aspect-ratio based spacing/sizes using cqw/cqh */
             --gap-btn: calc((24 / var(--ref-w)) * 100cqw); 
-            --pad-top: calc((141 / var(--ref-h)) * 100cqh);
+            /* REMOVED 141px padding requirement: Set to 0 */
+            --pad-top: 0;
             --pad-side: calc((50 / var(--ref-w)) * 100cqw);
             --header-btn-size: calc((120 / var(--ref-w)) * 100cqw);
             --pad-bottom: calc((186 / var(--ref-h)) * 100cqh);
@@ -83,7 +85,7 @@
 
         /* Camera/Picture state indicator */
         #camera-indicator {
-            position: absolute; top: calc(var(--pad-top) + 40px); left: 50%;
+            position: absolute; top: 40px; left: 50%;
             transform: translateX(-50%); font-size: 10px; text-transform: uppercase;
             letter-spacing: 2px; opacity: 0; color: var(--operator-orange);
             z-index: 100; transition: opacity 0.3s;
@@ -121,14 +123,13 @@
         .log-response { color: white; font-size: 13px; line-height: 1.4; white-space: pre-wrap; }
 
         /* Header / Nav UI */
-        .header { display: flex; justify-content: space-between; align-items: center; padding-top: var(--pad-top); padding-left: var(--pad-side); padding-right: var(--pad-side); width: 100%; box-sizing: border-box; z-index: 10; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; padding-left: var(--pad-side); padding-right: var(--pad-side); width: 100%; box-sizing: border-box; z-index: 10; }
         .header-btn { width: var(--header-btn-size); height: var(--header-btn-size); background-color: var(--sci-dark-grey); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: none; cursor: pointer; color: #FFFFFF; }
         .header-btn svg { width: 50%; height: 50%; stroke: currentColor; fill: none; stroke-width: 1.5; }
 
         /* Output Displays */
         .display-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding: 0 var(--pad-side) 2cqh var(--pad-side); overflow: hidden; z-index: 10; }
         
-        /* UPDATED: Ensuring no horizontal scroll and correct wrapping */
         .typed-text-display { 
             width: 100%; 
             color: rgba(255, 255, 255, var(--text-opacity)); 
@@ -137,9 +138,9 @@
             text-align: right; 
             max-height: 4.5em; 
             overflow-y: auto; 
-            overflow-x: hidden; /* Hide horizontal scroll */
+            overflow-x: hidden; 
             word-wrap: break-word; 
-            white-space: pre-wrap; /* Preserve line breaks but force wrap */
+            white-space: pre-wrap; 
             margin-bottom: 8px; 
             outline: none; 
             user-select: text; 
@@ -164,10 +165,7 @@
         .btn-operator { background-color: var(--operator-orange); font-size: var(--font-action); }
 
         /* --- MODE-SPECIFIC OVERRIDES --- */
-        /* Bring essential buttons above the camera feed (z-index 60 > 50) */
         .camera-essential { z-index: 60 !important; }
-        
-        /* Hide keyboard while camera is active */
         .keyboard-hidden { opacity: 0 !important; pointer-events: none !important; }
 
         .keyboard-grid { position: absolute; top: 0; left: 0; width: 100%; display: none; flex-direction: column; gap: var(--gap-btn); opacity: var(--kbd-opacity); padding-left: var(--pad-side); padding-right: var(--pad-side); box-sizing: border-box; height: calc((var(--btn-height) * 5) + (var(--gap-btn) * 4)); justify-content: center; z-index: 5; pointer-events: none; }
@@ -176,8 +174,7 @@
         .kbd-btn { background-color: var(--sci-dark-grey); border-radius: calc(var(--btn-height) * 0.2); flex: 1; font-size: calc(var(--font-upper) * 1.25); text-transform: lowercase; font-weight: 400; color: #FFF; pointer-events: auto; }
         .kbd-btn.shift-active { background-color: #FFFFFF; color: #000000; }
         
-        /* Persistent notification bar */
-        #api-status { position: absolute; top: var(--pad-top); left: 50%; transform: translateX(-50%); font-size: 10px; opacity: 0.8; letter-spacing: 1.2px; display: none; color: var(--operator-orange); font-weight: bold; width: 80%; text-align: center; pointer-events: none; z-index: 100; }
+        #api-status { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-size: 10px; opacity: 0.8; letter-spacing: 1.2px; display: none; color: var(--operator-orange); font-weight: bold; width: 80%; text-align: center; pointer-events: none; z-index: 100; }
     </style>
 </head>
 <body>
@@ -204,7 +201,6 @@
                 </select>
             </div>
             
-            <!-- SEPARATED INSTRUCTIONS (UPDATED DEFAULTS) -->
             <div class="setting-item">
                 <label>Thinking Instructions (Chat)</label>
                 <textarea id="prompt-thinking" placeholder="Instructions for standard chat..."></textarea>
@@ -329,7 +325,6 @@
                 overlay: localStorage.getItem('overlay') === null ? true : localStorage.getItem('overlay') === 'true',
                 apiKey: localStorage.getItem('deepseekKey') || "",
                 model: localStorage.getItem('deepseekModel') || "deepseek-reasoner",
-                // UPDATED INSTRUCTIONS PER USER REQUEST
                 thinkingPrompt: localStorage.getItem('promptThinking') || "Analyze the query and provide the most correct and concise answer. If it contains math, solve using Python logic. Think in thought about the answer deeply. Provide a short but most correct and concise answer, then explain why later.",
                 reasoningPrompt: localStorage.getItem('promptReasoning') || "Think deeply and provide the most correct and concise answer. If math, use Python logic. Explain the logic clearly after providing the result.",
                 cameraPrompt: localStorage.getItem('promptCamera') || "Analyze this image and provide a concise and most correct answer for each question in the image. If it contains math, solve using Python logic. If it is hard to read important text, such as being cut off or too blurry, ask the user to retake the image. Think in thought about the answer deeply. To answer, first provide question number if the question has the question number, then ABCD if multiple choice, for short but most correct and concise answer for written answer, repeat for all questions- then explain why later."
@@ -568,7 +563,8 @@
             document.querySelectorAll('.calc-btn').forEach(btn => {
                 btn.onclick = () => {
                     const label = btn.getAttribute('aria-label');
-                    const text = btn.childNodes[0].textContent.trim();
+                    const textNode = btn.childNodes[0];
+                    const text = textNode ? textNode.textContent.trim() : "";
                     if (btn.classList.contains('kbd-btn')) return;
 
                     if (isKeyboardMode) {
@@ -581,9 +577,7 @@
 
                     if (isKeyboardMode || isLogMode) {
                         if (label === 'Backspace') { const t = typedDisplay.textContent; if (t.length > 0) typedDisplay.textContent = t.slice(0, -1); }
-                        else if (text === 'AC') { 
-                            typedDisplay.textContent = ''; // AC clears typed text in keyboard mode too
-                        }
+                        else if (text === 'AC') { typedDisplay.textContent = ''; }
                         else if (text === '=') typedDisplay.appendChild(document.createTextNode('\n'));
                         else if (text === '%') typedDisplay.textContent = '';
                         else if (text === '÷') settingsPanel.style.display = 'flex';
@@ -591,12 +585,11 @@
                         return;
                     }
 
-                    // STANDARD CALC
                     const updateD = () => { let s = currentInput; if (s.length > 10 && !s.includes('e')) s = s.substring(0, 10); display.textContent = s; };
                     if (label === 'Backspace') { if (!waitingForNewValue) currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : '0'; updateD(); }
                     else if (text === 'AC') { 
                         currentInput = '0'; previousInput = ''; operator = null; waitingForNewValue = false; 
-                        typedDisplay.textContent = ''; // AC clears AI text box even in normal mode
+                        typedDisplay.textContent = ''; 
                         updateD(); 
                     }
                     else if (/[0-9]/.test(text)) { currentInput = (waitingForNewValue || currentInput === '0') ? text : currentInput + text; waitingForNewValue = false; updateD(); }
