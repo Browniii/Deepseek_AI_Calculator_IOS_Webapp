@@ -352,6 +352,30 @@
                 <textarea id="prompt-camera" placeholder="Instructions..."></textarea>
             </div>
 
+            <!-- NEW CAMERA HARDWARE SETTINGS -->
+            <div class="setting-item">
+                <label>Camera Aspect Ratio</label>
+                <select id="input-cam-ratio">
+                    <option value="4:3">4:3 (Standard Photo)</option>
+                    <option value="16:9">16:9 (Widescreen)</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label>Camera Hardware Zoom (If Supported)</label>
+                <select id="input-cam-zoom">
+                    <option value="0.5">0.5x (Ultra-wide)</option>
+                    <option value="1">1x (Standard)</option>
+                    <option value="2">2x (Telephoto)</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label>Camera View Fit</label>
+                <select id="input-cam-fit">
+                    <option value="cover">Fill Screen</option>
+                    <option value="contain">Fit to Screen</option>
+                </select>
+            </div>
+
             <div class="setting-item">
                 <label>Text Above Opacity: <span id="label-text-opacity">20</span>%</label>
                 <input type="range" id="input-text-opacity" min="0" max="100" value="20">
@@ -517,7 +541,10 @@
                 model: localStorage.getItem('deepseekModel') || "deepseek-reasoner",
                 thinkingPrompt: localStorage.getItem('promptThinking') || "Analyze the query and provide the most correct and concise answer. If it contains math, solve using Python logic. Think in thought about the answer deeply. Provide a short but most correct and concise answer, then explain why later.",
                 reasoningPrompt: localStorage.getItem('promptReasoning') || "Think deeply and provide the most correct and concise answer. If math, use Python logic. Explain the logic clearly after providing the result.",
-                cameraPrompt: localStorage.getItem('promptCamera') || "Analyze this image and provide a concise and most correct answer for each question in the image. If it contains math, solve using Python logic. If it is hard to read important text, such as being cut off or too blurry, ask the user to retake the image. Think in thought about the answer deeply. To answer, first provide question number if the question has the question number, then ABCD if multiple choice, for short but most correct and concise answer for written answer, repeat for all questions- then explain why later."
+                cameraPrompt: localStorage.getItem('promptCamera') || "Analyze this image and provide a concise and most correct answer for each question in the image. If it contains math, solve using Python logic. If it is hard to read important text, such as being cut off or too blurry, ask the user to retake the image. Think in thought about the answer deeply. To answer, first provide question number if the question has the question number, then ABCD if multiple choice, for short but most correct and concise answer for written answer, repeat for all questions- then explain why later.",
+                camRatio: localStorage.getItem('camRatio') || "4:3",
+                camZoom: localStorage.getItem('camZoom') || "1",
+                camFit: localStorage.getItem('camFit') || "cover"
             };
 
             /* --- UI ENGINE --- */
@@ -561,6 +588,13 @@
                 document.getElementById('prompt-thinking').value = prefs.thinkingPrompt;
                 document.getElementById('prompt-reasoning').value = prefs.reasoningPrompt;
                 document.getElementById('prompt-camera').value = prefs.cameraPrompt;
+
+                document.getElementById('input-cam-ratio').value = prefs.camRatio;
+                document.getElementById('input-cam-zoom').value = prefs.camZoom;
+                document.getElementById('input-cam-fit').value = prefs.camFit;
+                
+                video.style.objectFit = prefs.camFit;
+                photoPreview.style.objectFit = prefs.camFit;
                 
                 const backgroundVisible = (isKeyboardMode || isLogMode) ? prefs.overlay : true;
                 sciPad.style.opacity = backgroundVisible ? "1" : "0";
@@ -588,7 +622,32 @@
 
             const startCamera = async () => {
                 try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    const ratioVal = prefs.camRatio === '4:3' ? 4/3 : 16/9;
+                    const constraints = {
+                        video: {
+                            facingMode: 'environment',
+                            aspectRatio: { ideal: ratioVal }
+                        }
+                    };
+                    
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    
+                    // Try to apply hardware zoom if supported by the browser track
+                    try {
+                        const track = stream.getVideoTracks()[0];
+                        if (track.getCapabilities) {
+                            const caps = track.getCapabilities();
+                            if (caps.zoom) {
+                                let z = parseFloat(prefs.camZoom);
+                                // Ensure requested zoom is within hardware limits
+                                const safeZoom = Math.max(caps.zoom.min, Math.min(z, caps.zoom.max));
+                                await track.applyConstraints({ advanced: [{ zoom: safeZoom }] });
+                            }
+                        }
+                    } catch (e) {
+                        console.log("Hardware zoom constraints skipped or unsupported", e);
+                    }
+
                     video.srcObject = stream;
                     video.classList.add('active');
                     indicator.classList.add('visible');
@@ -941,6 +1000,10 @@
             });
 
             /* --- SETTINGS PERSISTENCE --- */
+            document.getElementById('input-cam-ratio').onchange = (e) => { prefs.camRatio = e.target.value; applyPrefs(); localStorage.setItem('camRatio', prefs.camRatio); };
+            document.getElementById('input-cam-zoom').onchange = (e) => { prefs.camZoom = e.target.value; applyPrefs(); localStorage.setItem('camZoom', prefs.camZoom); };
+            document.getElementById('input-cam-fit').onchange = (e) => { prefs.camFit = e.target.value; applyPrefs(); localStorage.setItem('camFit', prefs.camFit); };
+
             document.getElementById('input-text-opacity').oninput = (e) => { prefs.textOpacity = e.target.value; applyPrefs(); localStorage.setItem('textOpacity', prefs.textOpacity); };
             document.getElementById('input-kbd-opacity').oninput = (e) => { prefs.kbdOpacity = e.target.value; applyPrefs(); localStorage.setItem('kbdOpacity', prefs.kbdOpacity); };
             document.getElementById('input-cam-opacity').oninput = (e) => { prefs.camOpacity = e.target.value; applyPrefs(); localStorage.setItem('camOpacity', prefs.camOpacity); };
